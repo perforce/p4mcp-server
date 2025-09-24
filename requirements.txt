@@ -1,0 +1,14 @@
+# FastMCP framework
+fastmcp>=2.10.0
+
+# Perforce Python API
+p4python>=2023.1
+
+# Core dependencies
+asyncio
+dataclasses-json>=0.5.7
+pydantic>=2.0.0
+
+# Logging and configuration
+python-json-logger>=2.0.0
+pyyaml>=6.0
