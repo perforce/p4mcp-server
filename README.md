@@ -751,7 +751,7 @@ Example: Even if `noaccessuser` is in `accessgroup` (where MCP is enabled), the 
 
 ## Support
 
-Perforce P4 MCP Server is a community supported project and is not officially supported by Perforce
+Perforce P4 MCP Server is a community supported project and is not officially supported by Perforce.
 Pull requests and issues are the responsibility of the project's moderator(s); this may be a vetted individual or team with members outside of the Perforce organization.
 Perforce does not officially support these projects, therefore all issues should be reported and managed via GitHub (not via Perforce's standard support process).
 
