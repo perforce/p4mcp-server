@@ -3,6 +3,8 @@ import os
 import sys
 import importlib.metadata
 from PyInstaller.utils.hooks import collect_data_files
+import fakeredis
+fakeredis_path = os.path.dirname(fakeredis.__file__)
 
 dist = importlib.metadata.distribution("fastmcp")
 fastmcp_dist_info = dist._path
@@ -24,6 +26,8 @@ a = Analysis(
         ('icons/logo-p4mcp-icon.png', 'icons'),
         ('icons/logo-p4mcp-reg.png', 'icons'),
         (fastmcp_dist_info, os.path.basename(fastmcp_dist_info)),
+        (os.path.join(fakeredis_path, 'commands.json'), 'fakeredis'),
+        (os.path.join(fakeredis_path, 'model'), 'fakeredis/model'),
     ] + fakeredis_data,
     hiddenimports=['lupa', 'lupa.lua51'],
     hookspath=[],
