@@ -1,13 +1,15 @@
 # -*- mode: python ; coding: utf-8 -*-
-
 import os
 import sys
 import importlib.metadata
+from PyInstaller.utils.hooks import collect_data_files
 
 dist = importlib.metadata.distribution("fastmcp")
 fastmcp_dist_info = dist._path
 
-# Choose platform-specific consent_ui binary
+# Collect fakeredis data files (commands.json)
+fakeredis_data = collect_data_files('fakeredis')
+
 if sys.platform.startswith("win"):
     consent_ui = "src/telemetry/P4MCP.exe"
 else:
@@ -22,8 +24,8 @@ a = Analysis(
         ('icons/logo-p4mcp-icon.png', 'icons'),
         ('icons/logo-p4mcp-reg.png', 'icons'),
         (fastmcp_dist_info, os.path.basename(fastmcp_dist_info)),
-    ],
-    hiddenimports=[],
+    ] + fakeredis_data,
+    hiddenimports=['lupa', 'lupa.lua51'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
