@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
-from typing import Optional, List, Literal, Union
+from typing import Optional, List, Literal
 from enum import Enum
 import re
 
@@ -221,7 +221,6 @@ class QueryFilesParams(PaginatedParams):
         description="Second file path - required for diff action",
         examples=["//depot/projectX/file2.txt"]
     )
-    
     diff2: bool = Field(
         default=True,
         description="Use p4 diff2 for depot-to-depot diff, false for mixed diff",
@@ -489,7 +488,6 @@ class ModifyShelvesParams(BaseParams):
         description="Target changelist for unshelve operations",
         examples=["default", "54321"]
     )
-
     force: bool = Field(
         default=False,
         description="Force operation - use with caution",
@@ -525,12 +523,12 @@ class ModifyJobsParams(BaseParams):
 
 class ExecuteDeleteParams(BaseParams):
     """Parameters for executing approved delete operations."""
-    source_tool: Literal["modify_changelists", "modify_workspaces", "modify_files", "modify_shelves"] = Field(
+    source_tool: Literal["modify_changelists", "modify_workspaces", "modify_files", "modify_shelves", "modify_reviews"] = Field(
         description="The source tool that initiated the delete operation",
-        examples=["modify_changelists", "modify_workspaces", "modify_files", "modify_shelves"]
+        examples=["modify_changelists", "modify_workspaces", "modify_files", "modify_shelves", "modify_reviews"]
     )
     action: Literal["delete"] = Field(
-        description="The action to execute - always 'delete' for this operation",
+        description="The action to execute - 'delete' for most operations",
         examples=["delete"]
     )
     changelist_id: Optional[str] = Field(
@@ -549,7 +547,11 @@ class ExecuteDeleteParams(BaseParams):
         description="File paths - required for file operations",
         examples=[["//depot/projectX/file1.txt", "//depot/projectX/file2.txt"]]
     )
-
+    review_id: Optional[str] = Field(
+        default=None,
+        description="Review ID - required for review operations",
+        examples=["12345", "67890"]
+    )
     operation_id: Optional[str] = Field(
         default=None,
         description="Unique ID for the delete operation - used to retrieve pending operations",
@@ -579,6 +581,10 @@ class ExecuteDeleteParams(BaseParams):
         elif self.source_tool == "modify_shelves":
             if not self.changelist_id:
                 raise ValueError("changelist_id is required for modify_shelves operations")
+        
+        elif self.source_tool == "modify_reviews":
+            if not self.review_id:
+                raise ValueError("review_id is required for modify_reviews operations")
         
         return self
 

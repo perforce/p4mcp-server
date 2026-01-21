@@ -235,7 +235,7 @@ if "%P4PYTHON_VERSION%"=="" (
 )
 
 REM Check if PyInstaller is installed
-"%VENV_DIR%\Scripts\pip.exe" list | findstr /i "pyinstaller" >nul
+"%VENV_DIR%\Scripts\python.exe" -c "import PyInstaller" >nul 2>&1
 if errorlevel 1 (
     call :log_info "Installing PyInstaller..."
     "%VENV_DIR%\Scripts\pip.exe" install pyinstaller
@@ -274,7 +274,7 @@ if exist "src\telemetry\P4MCP.exe" (
 
 REM Build standalone binary for consent_ui.py
 call :log_info "Building standalone binary for consent_ui.py..."
-"%VENV_DIR%\Scripts\pyinstaller.exe" --onefile --noconsole --distpath src\telemetry --name "P4MCP" src\telemetry\consent_ui.py 
+"%VENV_DIR%\Scripts\python.exe" -m PyInstaller --onefile --noconsole --distpath src\telemetry --name "P4MCP" src\telemetry\consent_ui.py 
 if errorlevel 1 (
     call :log_error "Failed to build consent_ui binary"
     exit /b 1
@@ -289,7 +289,7 @@ if exist "src\telemetry\P4MCP.exe" (
 
 REM Run PyInstaller for main app
 call :log_info "Running PyInstaller for main app..."
-"%VENV_DIR%\Scripts\pyinstaller.exe" p4-mcp-server.spec
+"%VENV_DIR%\Scripts\python.exe" -m PyInstaller p4-mcp-server.spec
 if errorlevel 1 (
     call :log_error "PyInstaller build failed"
     exit /b 1

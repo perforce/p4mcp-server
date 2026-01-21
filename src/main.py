@@ -13,6 +13,8 @@ sys.path.insert(0, str(project_root))
 
 from src.server import P4MCPServer
 
+logger = logging.getLogger(__name__)
+
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser()
@@ -32,7 +34,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--toolsets",
         nargs='+',
-        default=["files", "changelists", "shelves", "workspaces", "jobs"],
+        default=["files", "changelists", "shelves", "workspaces", "jobs", "reviews"],
         help="List of toolsets to enable (default: files, changelists, shelves, workspaces, jobs)"
     )
     parser.add_argument(
@@ -52,7 +54,7 @@ def signal_handler(signum, frame):
 
 def main() -> None:
     setup_logging("INFO")
-    logger = logging.getLogger(__name__)
+
     
     # Register signal handlers for graceful shutdown
     signal.signal(signal.SIGTERM, signal_handler)

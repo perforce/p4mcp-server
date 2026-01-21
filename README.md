@@ -1,31 +1,46 @@
+
+<p align="center">
+  <img src="./icons/logo-p4mcp-reg.svg" alt="Perforce P4 MCP Server" width="480" />
+</p><br>
+
+
+<div align="center">
+
 ![Support](https://img.shields.io/badge/Support-Community-yellow.svg)
 
-# Perforce P4 MCP Server
+![Version](https://img.shields.io/badge/Version-2025.2.2880005-blue.svg)
 
-Perforce P4 MCP Server is a Model Context Protocol (MCP) server that integrates with the Perforce P4 version control system. It is built on FastMCP with direct P4 Python bindings to expose safe, structured read/write tools for changelists, files, shelves, workspaces, jobs, and server metadata.
+<h1>Perforce P4 MCP Server</h1>
 
-## Table of Contents
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Local P4 MCP Server installation](#local-p4-mcp-server-installation)
-- [MCP client configuration](#mcp-client-configuration)
-- [P4 configuration](#p4-configuration)
-  - [User configuration](#user-configuration)
-  - [Admin configuration](#admin-configuration)
-- [Available tools](#available-tools)
-  - [Query tools (read operations)](#query-tools-read-operations)
-  - [Modify tools (write operations)](#modify-tools-write-operations)
-- [Logging and usage data](#logging-and-usage-data)
-- [Troubleshooting](#troubleshooting)
-- [Support](#support)
-- [Contributions](#contributions)
-- [License](#license)
+<p>
+  <strong>Perforce P4 MCP Server is a Model Context Protocol (MCP) server that integrates with the Perforce P4 version control system. It is built on FastMCP with direct P4 Python bindings to expose safe, structured read/write tools for changelists, files, shelves, workspaces, jobs, reviews, and server metadata.</strong>
+</p>
+
+<nav aria-label="Quick navigation">
+  <p align="center">
+    <a href="#features">Features</a> ·
+    <a href="#prerequisites">Prerequisites</a> ·
+    <a href="#local-p4-mcp-server-installation">Install</a> ·
+    <a href="#mcp-client-configuration">Client Configurations</a> ·
+    <a href="#p4-configuration">P4 Configurations</a> ·
+    <a href="#available-tools">Tools</a> 
+  </p>
+   <p align="center">
+    <a href="#logging-and-usage-data">Logging</a> ·
+    <a href="#troubleshooting">Troubleshoot</a> ·
+    <a href="#support">Support</a> ·
+    <a href="#contributions">Contributions</a> ·
+    <a href="#license">License</a>
+  </p>
+</nav>
+</div>
 
 ## Features
 
-- **Comprehensive P4 integration**: Read/write tools across files, changelists, shelves, workspaces, jobs, and server information
+- **Comprehensive P4 integration**: Read/write tools across files, changelists, shelves, workspaces, jobs, reviews, and server information
+- **Code review workflows**: P4 Code Review support for review discovery, voting, state transitions, commenting, and participant management
 - **Safety first**: Read-only mode by default, ownership checks, explicit confirmation for destructive deletes.
-- **Flexible toolsets**: Configure which tool categories to enable: files, changelists, shelves, workspaces, and jobs.
+- **Flexible toolsets**: Configure which tool categories to enable: files, changelists, shelves, workspaces, jobs and reviews.
 - **Robust logging**: Application and session logging to the `logs/` directory.
 - **Optional telemetry**: Consent-gated usage statistics. Disabled by default.
 - **Cross platform**: Supported on macOS and Windows with pre-built binaries.
@@ -39,20 +54,20 @@ Perforce P4 MCP Server is a Model Context Protocol (MCP) server that integrates 
 <details><summary><b>Pre-built binaries (recommended)</b></summary>
 
 Download the appropriate binary for your operating system:
-- **Windows**: `binaries/win/p4-mcp-server-2025.1.0.zip`
-- **macOS**: `binaries/mac/p4-mcp-server-2025.1.0.tgz`
+- **Windows**: `binaries/win/p4-mcp-server-2025.2.0.zip`
+- **macOS**: `binaries/mac/p4-mcp-server-2025.2.0.tgz`
 
 Extract and use the executable directly. No Python installation is required.
 
 ```bash
 # Windows
-unzip p4-mcp-server-2025.1.0.zip
-cd p4-mcp-server-2025.1.0
+unzip p4-mcp-server-2025.2.0.zip
+cd p4-mcp-server-2025.2.0
 ./p4-mcp-server.exe --help
 
 # macOS
-tar -xzf p4-mcp-server-2025.1.0.tgz
-cd p4-mcp-server-2025.1.0
+tar -xzf p4-mcp-server-2025.2.0.tgz
+cd p4-mcp-server-2025.2.0
 ./p4-mcp-server --help
 ```
 
@@ -96,6 +111,14 @@ Output:
 </details>
 
 <br>
+
+<details>
+  <summary><strong>JetBrains IDEs (IntelliJ IDEA, Rider, PyCharm, etc.)</strong></summary>
+ 
+See the [JetBrains AI Assistant VCS Integration documentation](https://www.jetbrains.com/help/ai-assistant/ai-in-vcs-integration.html#configure-a-perforce-mcp-server) for detailed configuration steps.
+
+</details>
+
 <details>
   <summary><strong>Claude Code</strong></summary>
 
@@ -168,57 +191,9 @@ See the [Eclipse MCP documentation](https://eclipse.dev/lmos/docs/arc/mcp) for m
 ```
 </details>
 
-<details>
-  <summary><strong>IntelliJ</strong></summary>
-
-See the [Intellij MCP documentation](https://www.jetbrains.com/help/idea/mcp-server.html) for more information.
-
-```json
-{
-  "servers": {
-    "perforce-p4-mcp": {
-      "command": "/absolute/path/to/p4-mcp-server",
-      "env": {
-        "P4PORT": "ssl:perforce.example.com:1666",
-        "P4USER": "your_username",
-        "P4CLIENT": "your_workspace"
-      },
-      "args": [
-        "--readonly", "--allow-usage"
-      ]
-    }
-  }
-}
-```
-</details>
-
 <details><summary><strong>Kiro</strong></summary>
 
 See the [Kiro MCP documentation](https://kiro.dev/docs/mcp/configuration/) for more information.
-
-```json
-{
-  "mcpServers": {
-    "perforce-p4-mcp": {
-      "command": "/absolute/path/to/p4-mcp-server",
-      "env": {
-        "P4PORT": "ssl:perforce.example.com:1666",
-        "P4USER": "your_username",
-        "P4CLIENT": "your_workspace"
-      },
-      "args": [
-        "--readonly", "--allow-usage"
-      ]
-    }
-  }
-}
-```
-
-</details>
-
-<details><summary><strong>Rider</strong></summary>
-
-See the [Rider MCP documentation](https://www.jetbrains.com/help/rider/MCP_Server.html) for information.
 
 ```json
 {
@@ -305,7 +280,7 @@ See the [Windsurf MCP documentation](https://docs.windsurf.com/windsurf/cascade/
   - If missing, disables all usage statistics.
 
 - `--toolsets` - Specify which tool categories to enable.
-  - Available: `files`, `changelists`, `shelves`, `workspaces`, `jobs`
+  - Available: `files`, `changelists`, `shelves`, `workspaces`, `jobs`, `reviews`
   - Default: All toolsets enabled.
 
 ### Required configurations
@@ -474,6 +449,29 @@ Example: Even if `noaccessuser` is in `accessgroup` (where MCP is enabled), the 
 
 </details>
 
+<details>
+  <summary><strong><code>query_reviews</code></strong> - Review discovery, details, and activity</summary>
+
+- **Actions**: 
+  - `list` - List all reviews with optional filtering
+  - `dashboard` - Get current user's review dashboard (my reviews, needs attention)
+  - `get` - Get detailed review information
+  - `transitions` - Get available state transitions for a review
+  - `files_readby` - Get files read status by users
+  - `files` - Get files in a review (with optional version range)
+  - `activity` - Get review activity history
+  - `comments` - Get comments on a review
+- **Parameters**: 
+  - `review_id` - Review ID (required for get, transitions, files_readby, files, comments, activity)
+  - `review_fields` - Comma-separated fields to return (e.g., "id,description,author,state")
+  - `comments_fields` - Fields for comments (default: "id,body,user,time")
+  - `up_voters` - List of up voters for transitions
+  - `from_version`, `to_version` - Version range for files action
+  - `max_results` - Maximum results (default: 10)
+- **Use cases**: Code review discovery, review status tracking, comment retrieval, review activity monitoring
+
+</details>
+
 ### Modify tools (write operations)
 
 <details>
@@ -521,6 +519,51 @@ Example: Even if `noaccessuser` is in `accessgroup` (where MCP is enabled), the 
 - **Actions** - `link_job`, `unlink_job`
 - **Parameters** - `changelist_id`, `job_id`
 - **Use cases** - Defect tracking integration, requirement linking
+
+</details>
+
+<details>
+  <summary><strong><code>modify_reviews</code></strong> - Review creation, transitions, participants, and comments</summary>
+
+- **Actions**: 
+  - `create` - Create a new review from a changelist
+  - `refresh_projects` - Refresh project associations
+  - `vote` - Vote on a review (up, down, clear)
+  - `transition` - Change review state (needsRevision, needsReview, approved, committed, rejected, archived)
+  - `append_participants` - Add reviewers/groups to a review
+  - `replace_participants` - Replace all participants
+  - `delete_participants` - Remove participants from a review
+  - `add_comment` - Add a comment to a review
+  - `reply_comment` - Reply to an existing comment
+  - `append_change` - Add a changelist to an existing review
+  - `replace_with_change` - Replace review content with a changelist
+  - `join` - Join a review as a participant
+  - `leave` - Leave a review
+  - `archive_inactive` - Archive inactive reviews
+  - `mark_comment_read` / `mark_comment_unread` - Mark individual comment read status
+  - `mark_all_comments_read` / `mark_all_comments_unread` - Mark all comments read status
+  - `update_author` - Change the review author
+  - `update_description` - Update review description
+  - `obliterate` - Permanently delete a review
+- **Parameters**: 
+  - `review_id` - Review ID (required for most actions)
+  - `change_id` - Changelist ID (required for create, append_change, replace_with_change)
+  - `description` - Review description
+  - `reviewers`, `required_reviewers` - Lists of reviewer usernames
+  - `reviewer_groups` - Reviewer groups with requirements
+  - `vote_value` - Vote value: `up`, `down`, `clear`
+  - `version` - Review version for voting
+  - `transition` - Target state: `needsRevision`, `needsReview`, `approved`, `committed`, `approved:commit`, `rejected`, `archived`
+  - `jobs`, `fix_status`, `cleanup` - Job linking and cleanup options for transitions
+  - `users`, `groups` - Structured participant data for append/replace/delete
+  - `body` - Comment body text
+  - `task_state` - Comment task state: `open`, `comment`
+  - `notify` - Notification mode: `immediate`, `delayed`
+  - `comment_id` - Comment ID for replies or marking read/unread
+  - `context` - Comment context (file, line numbers, content, version)
+  - `not_updated_since`, `max_reviews` - Filters for archive_inactive
+  - `new_author`, `new_description` - Values for update actions
+- **Use cases**: Code review workflow, review state management, collaborative commenting, participant management, review cleanup
 
 </details>
 
@@ -761,5 +804,7 @@ We welcome contributions to the P4 MCP Server project.
 
 
 ## License
+This project is licensed under the MIT License. See [LICENSE](LICENSE.txt) for details.
 
-This project is licensed under the [MIT License](LICENSE.txt). See the LICENSE file for details.
+### Third-Party Notices
+This project includes third-party components. Their licenses and attributions are listed in [THIRD-PARTY-NOTICES](THIRD-PARTY-NOTICES.txt).

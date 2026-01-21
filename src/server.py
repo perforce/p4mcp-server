@@ -7,6 +7,7 @@ from .logging.session_logging import log_tool_call
 from .core.connection import P4ConnectionManager
 
 from .models import models as m
+from .models import review_models as review_m
 from .handlers.handlers import Handlers
 
 from .services.file_services import FileServices
@@ -15,6 +16,7 @@ from .services.shelve_services import ShelveServices
 from .services.workspace_services import WorkspaceServices
 from .services.changelist_services import ChangelistServices
 from .services.job_services import JobServices
+from .services.review_services import ReviewServices
 
 from .middleware.check_permission import CheckPermissionMiddleware
 
@@ -59,7 +61,8 @@ class P4MCPServer:
             file_services=FileServices(self.p4_manager),
             changelist_services=ChangelistServices(self.p4_manager),
             shelve_services=ShelveServices(self.p4_manager),
-            job_services=JobServices(self.p4_manager)
+            job_services=JobServices(self.p4_manager),
+            review_services=ReviewServices(self.p4_manager)
         )
 
     def process_tool_logs(self, tool_name: str, result: dict, ctx: Context) -> dict:
@@ -147,6 +150,16 @@ class P4MCPServer:
             self.process_tool_logs("query_jobs", result, ctx)
             return result
 
+        @self.mcp.tool(tags=["read", "reviews"], enabled="reviews" in self.toolsets)
+        async def query_reviews(params: review_m.QueryReviewsParams, ctx: Context) -> dict:
+            """Get review details and list reviews (READ permission).
+               Open review - state is 'approved but pending=true' or 'needsReview' or 'needsRevision'.
+               Closed review - state is 'approved but pending=false' or 'rejected' or 'archived'.
+            """
+            result = await self.handlers.handle("query", "reviews", params)
+            self.process_tool_logs("query_reviews", result, ctx)
+            return result
+
         @self.mcp.tool(tags=["write", "workspaces"], enabled=not self.readonly and "workspaces" in self.toolsets)
         async def modify_workspaces(params: m.ModifyWorkspacesParams, ctx: Context) -> dict:
             """Create/delete workspace, Update workspace specs, and switch active workspace (WRITE permission)"""
@@ -202,6 +215,18 @@ class P4MCPServer:
             self.process_tool_logs("modify_jobs", result, ctx)
             return result
 
+        @self.mcp.tool(tags=["write", "reviews"], enabled=not self.readonly and "reviews" in self.toolsets)
+        async def modify_reviews(params: review_m.ModifyReviewsParams, ctx: Context) -> dict:
+            """Create/update/delete reviews (WRITE permission)"""
+            if params.action == "delete":
+                # Handle delete operation with approval
+                result = {"status": "warning", "action": "delete", "message": "Requires approval to delete review."}
+                self.process_tool_logs("modify_reviews", result, ctx)
+                return self.requires_approval("modify_reviews", params)
+            result = await self.handlers.handle("modify", "reviews", params)
+            self.process_tool_logs("modify_reviews", result, ctx)
+            return result
+
         @self.mcp.tool(tags=["write", "delete"], enabled=not self.readonly and len(set(self.toolsets) - {"jobs"}) > 0)
         async def execute_delete(params: m.ExecuteDeleteParams, ctx: Context) -> dict:
             """Execute any approved delete operation from any tool (WRITE permission)"""
@@ -244,6 +269,15 @@ class P4MCPServer:
                     file_paths=params.file_paths
                 )
                 result = await self.handlers.handle("modify", "shelves", shelve_params)
+                self.process_tool_logs("execute_delete", result, ctx)
+                return result
+            
+            elif params.source_tool == "modify_reviews":
+                review_params = review_m.ModifyReviewsParams(
+                    action="delete", 
+                    review_id=params.review_id
+                )
+                result = await self.handlers.handle("modify", "reviews", review_params)
                 self.process_tool_logs("execute_delete", result, ctx)
                 return result
 

@@ -1,29 +1,22 @@
 import logging
+from .utils import handle_errors
+from .review_handlers import ReviewsHandlers
 
 logger = logging.getLogger(__name__)
-
-def handle_errors(func):
-    async def wrapper(self, params):
-        try:
-            return await func(self, params)
-        except Exception as e:
-            action = getattr(params, "action", None)
-            resp = {"status": "error", "message": str(e)}
-            if action is not None:
-                resp["action"] = action
-            return resp
-    return wrapper
 
 class Handlers:
     """Main handler class to process various operations with dispatch"""
 
-    def __init__(self, server_services, workspace_services, file_services, changelist_services, shelve_services, job_services):
+    def __init__(self, server_services, workspace_services, file_services, changelist_services, shelve_services, job_services, review_services):
         self.server_services = server_services
         self.workspace_services = workspace_services
         self.file_services = file_services
         self.changelist_services = changelist_services
         self.shelve_services = shelve_services
         self.job_services = job_services
+        self.review_services = review_services
+
+        self.reviews_handlers = ReviewsHandlers(review_services)
 
         # Dispatch table: (operation, sub-operation) -> handler
         self.dispatch = {
@@ -38,6 +31,9 @@ class Handlers:
             ("modify", "changelists"): self._handle_modify_changelists,
             ("modify", "shelves"): self._handle_modify_shelves,
             ("modify", "jobs"): self._handle_modify_jobs,
+
+            ("query", "reviews"):   self.reviews_handlers._handle_query_reviews,
+            ("modify", "reviews"): self.reviews_handlers._handle_modify_reviews,
         }
 
     async def handle(self, operation, sub_operation, params):
