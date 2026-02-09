@@ -2,6 +2,7 @@ import json
 import logging
 from fastmcp import FastMCP, Context
 from .core.config import Config
+from .core.schema_utils import flatten_schema
 from .logging.global_logging import setup_logging
 from .logging.session_logging import log_tool_call
 from .core.connection import P4ConnectionManager
@@ -49,9 +50,30 @@ class P4MCPServer:
         try:
             self._initialize_handlers()
             self._register_tools()
+            # Note: Schema flattening is done at request time via tool transformation
+            self._add_schema_transformation()
         except Exception as e:
             logger.error(f"Failed to initialize dependencies: {e}")
             raise
+
+    def _add_schema_transformation(self) -> None:
+        """Add schema transformation to flatten $defs for MCP client compatibility."""
+        from fastmcp.tools.tool import Tool
+        
+        # Store original to_mcp_tool method
+        original_to_mcp_tool = Tool.to_mcp_tool
+        
+        def patched_to_mcp_tool(self, **kwargs):
+            """Patched to_mcp_tool that flattens $defs in input schema."""
+            result = original_to_mcp_tool(self, **kwargs)
+            # Flatten the input schema if it has $defs
+            if hasattr(result, 'inputSchema') and result.inputSchema and "$defs" in result.inputSchema:
+                result.inputSchema = flatten_schema(result.inputSchema)
+            return result
+        
+        # Monkey-patch the method
+        Tool.to_mcp_tool = patched_to_mcp_tool
+        logger.debug("Added schema transformation for MCP client compatibility")
 
     def _initialize_handlers(self) -> None:
         """Initialize handlers with all services"""

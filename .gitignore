@@ -1,6 +1,8 @@
 build/
 dist/
+.venv/
 __pycache__/
 src/telemetry/P4MCP.exe
 P4MCP.spec
 .DS_Store
+*.log
