@@ -13,7 +13,7 @@ from .config import Config
 
 logger = logging.getLogger(__name__)
 
-__version__ = "2025.2.2880005"
+__version__ = "2025.2.2901372"
 
 class P4Session:
     """Manages P4 session with tracking and logging"""
@@ -218,6 +218,11 @@ class P4ConnectionManager:
         try:
             # Verify connection is still valid
             if not self._connection.connected():
+                # Force complete disconnect to clear cached ticket state
+                try:
+                    self._connection.disconnect()
+                except:
+                    pass
                 self._connection.connect()
 
             if self._connection.ticket_file:
@@ -226,15 +231,22 @@ class P4ConnectionManager:
             yield self._connection
             
         except P4Exception as e:
-            logger.error(f"P4Error: P4 operation error: {e}")
-            # Try to reconnect
-            try:
-                self._connection.disconnect()
-                self._connection.connect()
-            except:
-                pass
+            error_msg = str(e)
+            logger.error(f"P4Error: P4 operation error: {error_msg}")
+            
+            # If authentication fails, force full disconnect/reconnect to reload ticket file
+            if "P4PASSWD" in error_msg or "password" in error_msg.lower() or "expired" in error_msg.lower():
+                logger.info("Authentication error detected - forcing ticket reload")
+                try:
+                    # Complete disconnect to clear P4's internal ticket cache
+                    self._connection.disconnect()
+                    # Reconnect to force P4 to re-read the ticket file
+                    self._connection.connect()
+                except Exception as reconnect_error:
+                    logger.error(f"Failed to reconnect: {reconnect_error}")
+            
             raise
-    
+        
     async def cleanup(self):
         """Cleanup P4 connection and session"""
         if self._is_connected:

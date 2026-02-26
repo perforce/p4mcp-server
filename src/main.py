@@ -43,6 +43,18 @@ def parse_args() -> argparse.Namespace:
         default=False,
         help="Allow usage data collection (default: False)"
     )
+    parser.add_argument(
+        "--transport",
+        choices=["stdio", "http"],
+        default="stdio",
+        help="Transport protocol (default: stdio)"
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="Port for HTTP transport (default: 8000)"
+    )
 
     return parser.parse_args()
 
@@ -71,8 +83,12 @@ def main() -> None:
                 logger.info("Telemetry consent config exists.")
                 session_id = start_session()
         server = P4MCPServer(session_id=session_id, readonly=args.readonly, toolsets=args.toolsets)
-        logger.info("Starting P4 MCP Server")
-        server.run()
+        if args.transport == "http":
+            logger.info(f"Starting P4 MCP Server with HTTP transport on port {args.port}")
+            server.run(transport="http", port=args.port, host="0.0.0.0")
+        else:
+            logger.info("Starting P4 MCP Server with stdio transport")
+            server.run()
     except Exception as e:
         logger.error(f"An error occurred while starting the server: {e}")
         logger.debug("Traceback:", exc_info=True)

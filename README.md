@@ -8,7 +8,7 @@
 
 ![Support](https://img.shields.io/badge/Support-Community-yellow.svg)
 
-![Version](https://img.shields.io/badge/Version-2025.2.2880005-blue.svg)
+![GitHub release](https://img.shields.io/github/v/release/perforce/p4mcp-server?color=blue)
 
 <h1>Perforce P4 MCP Server</h1>
 
@@ -20,6 +20,7 @@
   <p align="center">
     <a href="#features">Features</a> ·
     <a href="#prerequisites">Prerequisites</a> ·
+    <a href="#system-requirements">System Requirements</a> ·
     <a href="#local-p4-mcp-server-installation">Install</a> ·
     <a href="#mcp-client-configuration">Client Configurations</a> ·
     <a href="#p4-configuration">P4 Configurations</a> ·
@@ -50,12 +51,20 @@
 - **P4 Server access**: Connection to a P4 Server with proper credentials
 - **Authentication**: Valid P4 login (ticket-based or password)
 
+## System Requirements
+
+| Component | Supported Versions |
+|-----------|-------------------|
+| **Operating Systems** | Windows 10+<br>macOS 12+<br>Ubuntu 20.04+ |
+| **Perforce P4 Server** | 2025.2 *(earlier versions untested)* |
+| **Python** | 3.11+ *(required only for building from source)* |
+
 ## Local P4 MCP Server installation
 <details><summary><b>Pre-built binaries (recommended)</b></summary>
 
 Download the appropriate binary for your operating system:
-- **Windows**: `binaries/win/p4-mcp-server-2025.2.0.zip`
-- **macOS**: `binaries/mac/p4-mcp-server-2025.2.0.tgz`
+- **macOS**: [p4-mcp-server-mac.zip](https://github.com/perforce/p4mcp-server/releases/latest/download/p4-mcp-server-mac.zip)
+- **Windows**: [p4-mcp-server-win.zip](https://github.com/perforce/p4mcp-server/releases/latest/download/p4-mcp-server-win.zip)
 
 Extract and use the executable directly. No Python installation is required.
 
@@ -86,6 +95,129 @@ Build:
 Output:
   - macOS: <code>p4-mcp-server-&lt;version&gt;.tgz</code>
   - Windows: <code>p4-mcp-server-&lt;version&gt;.zip</code>
+
+</details>
+
+<details><summary><b>Run from Docker</b></summary>
+
+Run the P4 MCP Server from a Docker container with STDIO transport, allowing MCP clients to manage the container lifecycle.
+
+> **Note:** Docker-based execution is currently supported on macOS and Linux only.
+
+**Prerequisites**
+
+- Docker installed and running
+- Valid P4 credentials and access to a P4 server
+
+**Build the Docker Image**
+
+```bash
+cd /path/to/p4mcp-server
+docker build -t p4-mcp-server .
+```
+
+**Configure MCP Client**
+
+Add the following to your `mcp.json`:
+
+```json
+{
+    "servers": {
+        "perforce-p4mcp-docker": {
+            "command": "docker",
+            "args": [
+                "run", "-i", "--rm",
+                "--hostname", "your-hostname",
+                "-e", "P4PORT=ssl:perforce.example.com:1666",
+                "-e", "P4USER=your_username",
+                "-e", "P4CLIENT=your_workspace",
+                "-v", "/Users/your_username/.p4tickets:/root/.p4tickets:ro",
+                "p4-mcp-server"
+            ]
+        }
+    }
+}
+```
+
+**Configuration Options**
+
+| Flag | Description |
+|------|-------------|
+| `-i` | Interactive mode (required for STDIO) |
+| `--rm` | Remove container when stopped |
+| `--hostname` | Match workspace host restriction |
+| `-e P4PORT` | P4 server address |
+| `-e P4USER` | P4 username |
+| `-e P4CLIENT` | Workspace name |
+| `-v` | Mount P4 tickets file |
+
+**Authentication**
+
+Using P4 tickets:
+```bash
+# macOS/Linux
+-v /Users/your_username/.p4tickets:/root/.p4tickets:ro
+```
+
+> **Note:** Use the full path to your tickets file (not `~`). After running `p4 login`, restart the MCP server to pick up the new ticket.
+
+Using a password:
+```bash
+-e P4PASSWD="your_password"
+```
+
+**Workspace Host Restrictions**
+
+> ⚠️ **Important:** Docker containers have their own hostname, which differs from your local machine. If your P4 workspace is restricted to a specific host, operations like `sync` will fail.
+
+To resolve this, set the container hostname to match your workspace's host restriction:
+
+```bash
+--hostname your-hostname
+```
+
+To find your workspace host name:
+```bash
+# macOS/Linux
+p4 client -o your_workspace | grep "^Host:"
+```
+
+**Mounting Client Root for Write Operations**
+
+> ⚠️ **Important:** By default, the Docker container cannot access your local workspace files. For write operations like `sync`, `submit`, or `reconcile`, you must mount your client root directory into the container at the **same path**.
+
+Add a volume mount for your client root:
+```bash
+-v /path/to/your/client/root:/path/to/your/client/root
+```
+
+Example configuration with client root mounted:
+```json
+{
+    "servers": {
+        "perforce-p4mcp-docker": {
+            "command": "docker",
+            "args": [
+                "run", "-i", "--rm",
+                "--hostname", "your-hostname",
+                "-e", "P4PORT=ssl:perforce.example.com:1666",
+                "-e", "P4USER=your_username",
+                "-e", "P4CLIENT=your_workspace",
+                "-v", "/Users/your_username/.p4tickets:/root/.p4tickets",
+                "-v", "/path/to/client/root:/path/to/client/root",
+                "p4-mcp-server"
+            ]
+        }
+    }
+}
+```
+
+To find your client root:
+```bash
+p4 client -o your_workspace | grep "^Root:"
+```
+
+> **Note:** The mount path inside the container must match the client root path exactly, as P4 tracks files by their absolute paths.
 
 </details>
 

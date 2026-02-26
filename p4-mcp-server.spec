@@ -2,7 +2,7 @@
 import os
 import sys
 import importlib.metadata
-from PyInstaller.utils.hooks import collect_data_files
+from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 import fakeredis
 fakeredis_path = os.path.dirname(fakeredis.__file__)
 
@@ -11,6 +11,9 @@ fastmcp_dist_info = dist._path
 
 # Collect fakeredis data files (commands.json)
 fakeredis_data = collect_data_files('fakeredis')
+
+# Collect rich._unicode_data submodules (dynamically imported at runtime)
+rich_unicode_imports = collect_submodules('rich._unicode_data')
 
 if sys.platform.startswith("win"):
     consent_ui = "src/telemetry/P4MCP.exe"
@@ -29,11 +32,11 @@ a = Analysis(
         (os.path.join(fakeredis_path, 'commands.json'), 'fakeredis'),
         (os.path.join(fakeredis_path, 'model'), 'fakeredis/model'),
     ] + fakeredis_data,
-    hiddenimports=['lupa', 'lupa.lua51'],
+    hiddenimports=['lupa', 'lupa.lua51'] + rich_unicode_imports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=['diskcache'],
     noarchive=False,
     optimize=0,
 )
