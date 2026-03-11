@@ -1,5 +1,5 @@
 """
-Fetch GitHub repo traffic (views, clones) and stars,
+Fetch GitHub repo traffic (views, clones), stars, and release downloads,
 then upload to the Logstash endpoint as NDJSON — the same format
 used by src/telemetry/upload_logs.py.
 
@@ -27,6 +27,32 @@ def github_get(url, headers, params=None):
     resp = requests.get(url, headers=headers, params=params, timeout=30)
     resp.raise_for_status()
     return resp.json()
+
+
+def github_get_paginated(url, headers, params=None):
+    """Make paginated GET requests to the GitHub API, returning all results."""
+    all_results = []
+    params = params or {}
+    params.setdefault("per_page", 100)
+    page = 1
+
+    while True:
+        params["page"] = page
+        resp = requests.get(url, headers=headers, params=params, timeout=30)
+        resp.raise_for_status()
+        data = resp.json()
+
+        if not data:
+            break
+
+        all_results.extend(data)
+        page += 1
+
+        # Stop if we got fewer results than per_page (last page)
+        if len(data) < params["per_page"]:
+            break
+
+    return all_results
 
 
 def send_to_logstash(endpoint, docs):
@@ -121,6 +147,65 @@ def collect_traffic_clones(owner, repo, headers):
     return docs
 
 
+def collect_release_downloads(owner, repo, headers):
+    """Fetch download counts for all release assets."""
+    releases = github_get_paginated(
+        f"{GITHUB_API_BASE}/repos/{owner}/{repo}/releases",
+        headers,
+    )
+
+    collected_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    full_repo = f"{owner}/{repo}"
+    docs = []
+
+    for release in releases:
+        tag_name = release.get("tag_name", "unknown")
+        release_name = release.get("name", tag_name)
+        published_at = release.get("published_at", "")
+        is_prerelease = release.get("prerelease", False)
+        assets = release.get("assets", [])
+
+        total_release_downloads = sum(
+            asset.get("download_count", 0) for asset in assets
+        )
+
+        # One doc per asset
+        for asset in assets:
+            docs.append({
+                "event_type": "github_repo_release_downloads",
+                "repo": full_repo,
+                "timestamp": collected_at,
+                "tag_name": tag_name,
+                "release_name": release_name,
+                "published_at": published_at,
+                "is_prerelease": is_prerelease,
+                "asset_name": asset.get("name", "unknown"),
+                "asset_content_type": asset.get("content_type", "unknown"),
+                "asset_size_bytes": asset.get("size", 0),
+                "download_count": asset.get("download_count", 0),
+                "total_release_downloads": total_release_downloads,
+            })
+
+        # If a release has no assets, still record it
+        if not assets:
+            docs.append({
+                "event_type": "github_repo_release_downloads",
+                "repo": full_repo,
+                "timestamp": collected_at,
+                "tag_name": tag_name,
+                "release_name": release_name,
+                "published_at": published_at,
+                "is_prerelease": is_prerelease,
+                "asset_name": "none",
+                "asset_content_type": "none",
+                "asset_size_bytes": 0,
+                "download_count": 0,
+                "total_release_downloads": 0,
+            })
+
+    return docs
+
+
 def main():
     # ── Read configuration from environment variables ──
     github_token = os.environ.get("GITHUB_TOKEN")
@@ -168,6 +253,19 @@ def main():
         logger.info(f"Collected {len(clones_docs)} traffic clones records for {full_repo}")
     except requests.exceptions.RequestException as e:
         logger.error(f"Failed to fetch traffic clones: {e}")
+        had_errors = True
+
+    # 4) Release downloads
+    try:
+        release_docs = collect_release_downloads(owner, repo, headers)
+        all_docs.extend(release_docs)
+        total_downloads = sum(d.get("download_count", 0) for d in release_docs)
+        logger.info(
+            f"Collected {len(release_docs)} release download records for {full_repo} "
+            f"({total_downloads} total downloads)"
+        )
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to fetch release downloads: {e}")
         had_errors = True
 
     # ── Upload everything to Logstash in a single NDJSON request ──
