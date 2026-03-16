@@ -123,8 +123,9 @@ class P4MCPServer:
             self.process_tool_logs("query_server", result, ctx)
             return result
         
-        @self.mcp.tool(tags=["read", "workspaces"], enabled="workspaces" in self.toolsets)
-        async def query_workspaces(
+        if "workspaces" in self.toolsets:
+          @self.mcp.tool(tags=["read", "workspaces"])
+          async def query_workspaces(
             action: Annotated[Literal["list", "get", "type", "status"], Field(
                 description="Workspace query action"
             )],
@@ -157,8 +158,9 @@ class P4MCPServer:
             self.process_tool_logs("query_workspaces", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["read", "files"], enabled="files" in self.toolsets)
-        async def query_files(
+        if "files" in self.toolsets:
+          @self.mcp.tool(tags=["read", "files"])
+          async def query_files(
             action: Annotated[Literal["content", "history", "info", "metadata", "diff", "annotations"], Field(
                 description="File query action, metadata includes extra information like optional attributes and file size"
             )],
@@ -195,8 +197,9 @@ class P4MCPServer:
             self.process_tool_logs("query_files", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["read", "changelists"], enabled="changelists" in self.toolsets)
-        async def query_changelists(
+        if "changelists" in self.toolsets:
+          @self.mcp.tool(tags=["read", "changelists"])
+          async def query_changelists(
             action: Annotated[Literal["get", "list"], Field(
                 description="Changelist query action"
             )],
@@ -246,8 +249,9 @@ class P4MCPServer:
             self.process_tool_logs("query_changelists", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["read", "shelves"], enabled="shelves" in self.toolsets)
-        async def query_shelves(
+        if "shelves" in self.toolsets:
+          @self.mcp.tool(tags=["read", "shelves"])
+          async def query_shelves(
             action: Annotated[Literal["list", "diff", "files"], Field(
                 description="Shelve query action"
             )],
@@ -280,8 +284,9 @@ class P4MCPServer:
             self.process_tool_logs("query_shelves", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["read", "jobs"], enabled="jobs" in self.toolsets)
-        async def query_jobs(
+        if "jobs" in self.toolsets:
+          @self.mcp.tool(tags=["read", "jobs"])
+          async def query_jobs(
             action: Annotated[Literal["list_jobs", "get_job"], Field(
                 description="Job query action"
             )],
@@ -314,8 +319,9 @@ class P4MCPServer:
             self.process_tool_logs("query_jobs", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["read", "reviews"], enabled="reviews" in self.toolsets)
-        async def query_reviews(
+        if "reviews" in self.toolsets:
+          @self.mcp.tool(tags=["read", "reviews"])
+          async def query_reviews(
             action: Annotated[Literal["list", "dashboard", "get", "transitions", "files_readby", "files", "comments", "activity"], Field(
                 description="Review query action: list all reviews, dashboard for current user, get specific review, transitions, files_readby, files, comments, activity"
             )],
@@ -373,8 +379,9 @@ class P4MCPServer:
             self.process_tool_logs("query_reviews", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["write", "workspaces"], enabled=not self.readonly and "workspaces" in self.toolsets)
-        async def modify_workspaces(
+        if not self.readonly and "workspaces" in self.toolsets:
+          @self.mcp.tool(tags=["write", "workspaces"])
+          async def modify_workspaces(
             action: Annotated[Literal["create", "delete", "update", "switch"], Field(
                 description="Workspace modification action"
             )],
@@ -400,8 +407,9 @@ class P4MCPServer:
             self.process_tool_logs("modify_workspaces", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["write", "files"], enabled=not self.readonly and "files" in self.toolsets)
-        async def modify_files(
+        if not self.readonly and "files" in self.toolsets:
+          @self.mcp.tool(tags=["write", "files"])
+          async def modify_files(
             action: Annotated[Literal["add", "edit", "delete", "move", "revert", "reconcile", "resolve", "sync"], Field(
                 description="File modification action"
             )],
@@ -453,8 +461,9 @@ class P4MCPServer:
             self.process_tool_logs("modify_files", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["write", "changelists"], enabled=not self.readonly and "changelists" in self.toolsets)
-        async def modify_changelists(
+        if not self.readonly and "changelists" in self.toolsets:
+          @self.mcp.tool(tags=["write", "changelists"])
+          async def modify_changelists(
             action: Annotated[Literal["create", "update", "submit", "delete", "move_files"], Field(
                 description="Changelist modification action"
             )],
@@ -490,8 +499,9 @@ class P4MCPServer:
             self.process_tool_logs("modify_changelists", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["write", "shelves"], enabled=not self.readonly and "shelves" in self.toolsets)
-        async def modify_shelves(
+        if not self.readonly and "shelves" in self.toolsets:
+          @self.mcp.tool(tags=["write", "shelves"])
+          async def modify_shelves(
             action: Annotated[Literal["shelve", "unshelve", "update", "delete", "unshelve_to_changelist"], Field(
                 description="Shelve modification action"
             )],
@@ -531,8 +541,9 @@ class P4MCPServer:
             self.process_tool_logs("modify_shelves", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["write", "jobs"], enabled=not self.readonly and "jobs" in self.toolsets)
-        async def modify_jobs(
+        if not self.readonly and "jobs" in self.toolsets:
+          @self.mcp.tool(tags=["write", "jobs"])
+          async def modify_jobs(
             action: Annotated[Literal["link_job", "unlink_job"], Field(
                 description="Job modification action"
             )],
@@ -552,8 +563,9 @@ class P4MCPServer:
             self.process_tool_logs("modify_jobs", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["write", "reviews"], enabled=not self.readonly and "reviews" in self.toolsets)
-        async def modify_reviews(
+        if not self.readonly and "reviews" in self.toolsets:
+          @self.mcp.tool(tags=["write", "reviews"])
+          async def modify_reviews(
             action: Annotated[Literal[
                 "create", "refresh_projects", "vote", "transition",
                 "append_participants", "add_comment", "reply_comment",
@@ -695,8 +707,9 @@ class P4MCPServer:
             self.process_tool_logs("modify_reviews", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["write", "delete"], enabled=not self.readonly and len(set(self.toolsets) - {"jobs"}) > 0)
-        async def execute_delete(
+        if not self.readonly and len(set(self.toolsets) - {"jobs"}) > 0:
+          @self.mcp.tool(tags=["write", "delete"])
+          async def execute_delete(
             source_tool: Annotated[Literal["modify_changelists", "modify_workspaces", "modify_files", "modify_shelves", "modify_reviews"], Field(
                 description="The source tool that initiated the delete operation"
             )],
