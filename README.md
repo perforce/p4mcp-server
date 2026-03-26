@@ -400,6 +400,8 @@ See the [Windsurf MCP documentation](https://docs.windsurf.com/windsurf/cascade/
 - `P4PORT` - P4 Server address. Examples: `ssl:perforce.example.com:1666`, `localhost:1666`
 - `P4USER` - Your P4 username
 - `P4CLIENT` - Your current P4 workspace. Optional, but recommended
+- `P4MCP_SSL_VERIFY` - Set to `false` to disable SSL verification for P4 Code Review API requests. Default: `true`
+- `P4MCP_CA_BUNDLE` - Path to a custom CA certificate bundle (PEM) for P4 Code Review API requests. Takes priority over `P4MCP_SSL_VERIFY`
 
 ### Supported arguments
 
@@ -414,6 +416,12 @@ See the [Windsurf MCP documentation](https://docs.windsurf.com/windsurf/cascade/
 - `--toolsets` - Specify which tool categories to enable.
   - Available: `files`, `changelists`, `shelves`, `workspaces`, `jobs`, `reviews`
   - Default: All toolsets enabled.
+
+- `--ssl-no-verify` - Disable SSL certificate verification for P4 Code Review API requests.
+  - Useful for environments with self-signed or internal CA certificates.
+
+- `--ca-bundle <path>` - Path to a custom CA certificate bundle (PEM) for P4 Code Review API requests.
+  - Use this to trust an internal CA without disabling verification entirely.
 
 ### Required configurations
 - Use absolute paths for the `command` field in all configurations.
@@ -782,13 +790,24 @@ Example: Even if `noaccessuser` is in `accessgroup` (where MCP is enabled), the 
 </details>
 
 <details>
-  <summary><strong>SSL certificate not trusted</strong></summary>
+  <summary><strong>SSL certificate not trusted (P4 connection)</strong></summary>
 
-**Symptoms**: SSL trust errors when connecting  
+**Symptoms**: SSL trust errors when connecting to the P4 server
 **Solutions**:
 1. Trust the server: `p4 trust -f -y`
 2. Check trust status: `p4 trust -l`
 3. For persistent issues, verify the SSL configuration.
+
+</details>
+
+<details>
+  <summary><strong>SSL certificate errors for P4 Code Review API (reviews)</strong></summary>
+
+**Symptoms**: `CERTIFICATE_VERIFY_FAILED` errors when using review tools
+**Solutions**:
+1. **Custom CA bundle**: Point to your internal CA certificate with `--ca-bundle /path/to/ca.pem` or set the `P4MCP_CA_BUNDLE` environment variable.
+2. **Disable verification**: Use `--ssl-no-verify` or set `P4MCP_SSL_VERIFY=false` (not recommended for production).
+3. **Priority order**: CLI args (`--ca-bundle` / `--ssl-no-verify`) take priority over environment variables, which take priority over the default (verify enabled).
 
 </details>
 

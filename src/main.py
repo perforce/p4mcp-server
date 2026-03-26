@@ -44,6 +44,18 @@ def parse_args() -> argparse.Namespace:
         help="Allow usage data collection (default: False)"
     )
     parser.add_argument(
+        "--ssl-no-verify",
+        action="store_true",
+        default=False,
+        help="Disable SSL certificate verification for Swarm API requests"
+    )
+    parser.add_argument(
+        "--ca-bundle",
+        type=str,
+        default=None,
+        help="Path to a custom CA certificate bundle (PEM) for Swarm API requests"
+    )
+    parser.add_argument(
         "--transport",
         choices=["stdio", "http"],
         default="stdio",
@@ -82,7 +94,14 @@ def main() -> None:
             if consent_config_exist():
                 logger.info("Telemetry consent config exists.")
                 session_id = start_session()
-        server = P4MCPServer(session_id=session_id, readonly=args.readonly, toolsets=args.toolsets)
+        # Determine SSL verify: --ca-bundle path > --ssl-no-verify > env vars > default (True)
+        if args.ca_bundle:
+            ssl_verify = args.ca_bundle
+        elif args.ssl_no_verify:
+            ssl_verify = False
+        else:
+            ssl_verify = None  # let Config/env decide
+        server = P4MCPServer(session_id=session_id, readonly=args.readonly, toolsets=args.toolsets, ssl_verify=ssl_verify)
         if args.transport == "http":
             logger.info(f"Starting P4 MCP Server with HTTP transport on port {args.port}")
             server.run(transport="http", port=args.port, host="0.0.0.0")

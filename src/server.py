@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class P4MCPServer:
     """Perforce MCP Server with improved structure"""
 
-    def __init__(self, session_id: str = None, readonly: bool = True, toolsets: list = []):
+    def __init__(self, session_id: str = None, readonly: bool = True, toolsets: list = [], ssl_verify=None):
         self.readonly = readonly
         self.toolsets = toolsets
         self.session_id = session_id
@@ -35,6 +35,10 @@ class P4MCPServer:
         setup_logging()
         self.p4config = Config.load()
         self.p4_manager = P4ConnectionManager(self.p4config)
+
+        # CLI args take priority over config/env for SSL verify
+        if ssl_verify is not None:
+            self.p4config.ssl_verify = ssl_verify
 
         if self.readonly:
             logger.info("Running in read-only mode. No write operations will be allowed.")
@@ -64,7 +68,7 @@ class P4MCPServer:
             changelist_services=ChangelistServices(self.p4_manager),
             shelve_services=ShelveServices(self.p4_manager),
             job_services=JobServices(self.p4_manager),
-            review_services=ReviewServices(self.p4_manager)
+            review_services=ReviewServices(self.p4_manager, verify_ssl=self.p4config.ssl_verify)
         )
 
     def process_tool_logs(self, tool_name: str, result: dict, ctx: Context) -> dict:
