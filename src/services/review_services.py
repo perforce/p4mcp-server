@@ -115,6 +115,8 @@ class ReviewServices:
             after: Optional[str] = None,
             after_updated: Optional[str] = None,
             result_order: Optional[str] = None,
+            author: Optional[List[str]] = None,
+            change: Optional[List[int]] = None,
             projects: Optional[List[str]] = None,
             state: Optional[List[str]] = None,
             keywords: Optional[str] = None,
@@ -137,6 +139,12 @@ class ReviewServices:
                 params["resultOrder"] = result_order
 
             # filters
+            if author:
+                params["author[]"] = author
+            if change:
+                # v11 has no change[] param; use keywords + keywordsFields instead
+                params["keywords"] = " ".join(str(c) for c in change)
+                params["keywordsFields[]"] = ["changes"]
             if projects:
                 params["project[]"] = projects
             if state:

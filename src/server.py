@@ -317,13 +317,27 @@ class P4MCPServer:
         @self.mcp.tool(tags=["read", "reviews"], enabled="reviews" in self.toolsets)
         async def query_reviews(
             action: Annotated[Literal["list", "dashboard", "get", "transitions", "files_readby", "files", "comments", "activity"], Field(
-                description="Review query action: list all reviews, dashboard for current user, get specific review, transitions, files_readby, files, comments, activity"
+                description="Review query action: "
+                    "'list' to search/filter reviews (supports author, change, project, state, keywords filters), "
+                    "'dashboard' for reviews needing the authenticated user's attention (reviews to act on, not all authored reviews), "
+                    "'get' for a specific review by ID, "
+                    "'transitions', 'files_readby', 'files', 'comments', 'activity' for review details"
             )],
             ctx: Context,
             review_id: Annotated[Optional[int], Field(
                 default=None,
                 description="Review ID - required for get, transitions, files_readby, files, comments, activity actions",
                 examples=[12345, 67890]
+            )] = None,
+            author: Annotated[Optional[List[str]], Field(
+                default=None,
+                description="Filter by review author(s) — for list action only",
+                examples=[["alice"]]
+            )] = None,
+            change: Annotated[Optional[List[int]], Field(
+                default=None,
+                description="Filter by associated changelist number(s) — for list action only. Use this to find the review for a specific changelist.",
+                examples=[[12345]]
             )] = None,
             review_fields: Annotated[Optional[str], Field(
                 default=None,
@@ -362,6 +376,8 @@ class P4MCPServer:
             params = review_m.QueryReviewsParams(
                 action=action,
                 review_id=review_id,
+                author=author,
+                change=change,
                 review_fields=review_fields,
                 comments_fields=comments_fields,
                 up_voters=up_voters,

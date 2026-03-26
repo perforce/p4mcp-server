@@ -33,16 +33,29 @@ class QueryReviewsParams(PaginatedParams):
 
     action: ReviewAction = Field(
         description=(
-            "Review query action: list all reviews."
-            "'dashboard' for current user (my reviews, needs my attention, authenticated user reviews), "
-            "get specific review, transitions, files_readby, files (from/to), comments"
+            "Review query action: "
+            "'list' to search/filter reviews (supports author, change, project, state, keywords filters), "
+            "'dashboard' for reviews needing the authenticated user's attention (reviews to act on, not all authored reviews), "
+            "'get' for a specific review by ID, "
+            "'transitions', 'files_readby', 'files', 'comments', 'activity' for review details"
         ),
         examples=["list", "dashboard", "get", "transitions", "files_readby", "files", "comments", "activity"],
     )
     review_id: Optional[int] = Field(
         default=None,
-        description="Review ID—required for get, transitions, files_readby, files,  comments, and activity actions",
+        description="Review ID — required for get, transitions, files_readby, files, comments, and activity actions",
         examples=[12345, 67890],
+    )
+    author: Optional[List[str]] = Field(
+        default=None,
+        description="Filter by review author(s) — for list action only",
+        examples=[["alice"], ["alice", "bob"]],
+    )
+    change: Optional[List[int]] = Field(
+        default=None,
+        description="Filter by associated changelist number(s) — for list action only. "
+                    "Use this to find the review for a specific changelist.",
+        examples=[[12345], [12345, 67890]],
     )
     review_fields: Optional[str] = Field(
         default=None,

@@ -25,6 +25,8 @@ class ReviewsHandlers:
                 after=getattr(params, "after", None),
                 after_updated=getattr(params, "after_updated", None),
                 result_order=getattr(params, "result_order", None),
+                author=getattr(params, "author", None),
+                change=getattr(params, "change", None),
                 projects=getattr(params, "projects", None),
                 state=getattr(params, "state", None),
                 keywords=getattr(params, "keywords", None),
