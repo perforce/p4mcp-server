@@ -13,52 +13,56 @@ jobs:
 
     steps:
       - name: Create Jira Issue
-        shell: bash
         env:
           JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
           JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}
         run: |
-          set -euo pipefail
-
           echo "Creating Jira ticket..."
 
-          # Basic sanity checks (fail fast with clear errors)
-          : "${JIRA_EMAIL:?Missing secret JIRA_EMAIL}"
-          : "${JIRA_API_TOKEN:?Missing secret JIRA_API_TOKEN}"
-          : "${JIRA_BASE_URL:?Missing secret JIRA_BASE_URL}"
-          : "${JIRA_PROJECT_KEY:?Missing secret JIRA_PROJECT_KEY}"
+          ISSUE_BODY=$(echo "${{ github.event.issue.body }}" | head -c 5000 | jq -Rs .)
+          ISSUE_URL="${{ github.event.issue.html_url }}"
 
-          # Normalize base URL to avoid accidental double slashes
-          JIRA_BASE_URL="${JIRA_BASE_URL%/}"
-
-          # Build JSON safely. jq will escape quotes/newlines in issue title/body.
-          ISSUE_JSON=$(jq -n \ 
-            --arg projectKey "${JIRA_PROJECT_KEY}" \ 
-            --arg summary "${{ github.event.issue.title }}" \ 
-            --arg description "GitHub Issue: ${{ github.event.issue.html_url }}\n\n${{ github.event.issue.body }}" \ 
-            ' {
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST \
+            -u "$JIRA_EMAIL:$JIRA_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data "$(jq -n \
+              --arg project_key "$JIRA_PROJECT_KEY" \
+              --arg summary "${{ github.event.issue.title }}" \
+              --arg url "$ISSUE_URL" \
+              --argjson body "$ISSUE_BODY" \
+              '{
                 fields: {
-                  project: { key: $projectKey },
+                  project: { key: $project_key },
                   summary: $summary,
-                  description: $description,
+                  description: {
+                    type: "doc",
+                    version: 1,
+                    content: [
+                      {
+                        type: "paragraph",
+                        content: [
+                          { type: "text", text: "GitHub Issue: " },
+                          { type: "text", text: $url, marks: [{ type: "link", attrs: { href: $url } }] }
+                        ]
+                      },
+                      {
+                        type: "paragraph",
+                        content: [
+                          { type: "text", text: $body }
+                        ]
+                      }
+                    ]
+                  },
                   issuetype: { name: "Task" }
                 }
-              } '
-          )
+              }')" \
+            $JIRA_BASE_URL/rest/api/3/issue)
 
-          # Capture body and status separately (avoid string matching on combined output)
-          HTTP_STATUS=$(curl -sS -o response.json -w "%{http_code}" -X POST \ 
-            -u "$JIRA_EMAIL:$JIRA_API_TOKEN" \ 
-            -H "Content-Type: application/json" \ 
-            --data "$ISSUE_JSON" \ 
-            "$JIRA_BASE_URL/rest/api/3/issue")
+          echo "$RESPONSE"
 
-          echo "HTTP_STATUS=$HTTP_STATUS"
-          cat response.json || true
-
-          if [[ "$HTTP_STATUS" != "201" ]]; then
+          if [[ "$RESPONSE" != *"HTTP_STATUS:201"* ]]; then
             echo "❌ Failed to create Jira ticket"
             exit 1
           fi
