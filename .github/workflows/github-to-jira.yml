@@ -1,0 +1,48 @@
+name: Create Jira Ticket from GitHub Issue
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+
+jobs:
+  create-jira-ticket:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create Jira Issue
+        env:
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}
+        run: |
+          echo "Creating Jira ticket..."
+
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST \
+            -u "$JIRA_EMAIL:$JIRA_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data "{
+              \"fields\": {
+                \"project\": {
+                  \"key\": \"$JIRA_PROJECT_KEY\"
+                },
+                \"summary\": \"${{ github.event.issue.title }}\",
+                \"description\": \"GitHub Issue: ${{ github.event.issue.html_url }}\n\n${{ github.event.issue.body }}\",
+                \"issuetype\": {
+                  \"name\": \"Task\"
+                }
+              }
+            }" \
+            $JIRA_BASE_URL/rest/api/3/issue)
+
+          echo "$RESPONSE"
+
+          if [[ "$RESPONSE" != *"HTTP_STATUS:201"* ]]; then
+            echo "❌ Failed to create Jira ticket"
+            exit 1
+          fi
+
+          echo "✅ Jira ticket created successfully"
