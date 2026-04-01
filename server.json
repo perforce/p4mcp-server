@@ -1,0 +1,45 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.perforce/p4mcp-server",
+  "title": "Perforce P4 MCP Server",
+  "description": "Perforce P4 MCP server: changelists, files, shelves, workspaces, jobs, code reviews, and streams.",
+  "version": "1.0.0",
+  "repository": {
+    "source": "github",
+    "url": "https://github.com/perforce/p4mcp-server"
+  },
+  "packages": [
+    {
+      "registryType": "oci",
+      "identifier": "ghcr.io/perforce/p4mcp-server:1.0.0",
+      "runtime": {
+        "name": "docker"
+      },
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "P4PORT",
+          "description": "Perforce server address (e.g. ssl:perforce.example.com:1666)",
+          "required": true
+        },
+        {
+          "name": "P4USER",
+          "description": "Perforce username",
+          "required": true
+        },
+        {
+          "name": "P4CLIENT",
+          "description": "Perforce workspace/client name",
+          "required": false
+        },
+        {
+          "name": "P4PASSWD",
+          "description": "Perforce password or ticket",
+          "required": false
+        }
+      ]
+    }
+  ]
+}
