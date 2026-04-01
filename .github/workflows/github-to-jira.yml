@@ -13,56 +13,89 @@ jobs:
 
     steps:
       - name: Create Jira Issue
+        shell: bash
         env:
           JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
           JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}
         run: |
+          set -euo pipefail
+
           echo "Creating Jira ticket..."
 
-          ISSUE_BODY=$(echo "${{ github.event.issue.body }}" | head -c 5000 | jq -Rs .)
-          ISSUE_URL="${{ github.event.issue.html_url }}"
+          # Basic sanity checks (fail fast with clear errors)
+          : "${JIRA_EMAIL:?Missing secret JIRA_EMAIL}"
+          : "${JIRA_API_TOKEN:?Missing secret JIRA_API_TOKEN}"
+          : "${JIRA_BASE_URL:?Missing secret JIRA_BASE_URL}"
+          : "${JIRA_PROJECT_KEY:?Missing secret JIRA_PROJECT_KEY}"
 
-          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST \
+          # Normalize base URL to avoid accidental double slashes
+          JIRA_BASE_URL="${JIRA_BASE_URL%/}"
+
+          ISSUE_TITLE='${{ github.event.issue.title }}'
+          ISSUE_URL='${{ github.event.issue.html_url }}'
+
+          # Body can be null/empty; normalize it so jq doesn't get "null"
+          ISSUE_BODY='${{ github.event.issue.body }}'
+          if [[ "$ISSUE_BODY" == "null" ]]; then
+            ISSUE_BODY=""
+          fi
+
+          # Build Atlassian Document Format (ADF) rich text for description
+          # This creates a linked URL paragraph plus the issue body as text.
+          ISSUE_JSON=$(jq -n \
+            --arg projectKey "${JIRA_PROJECT_KEY}" \
+            --arg summary "${ISSUE_TITLE}" \
+            --arg url "${ISSUE_URL}" \
+            --arg body "${ISSUE_BODY}" \
+            '{
+              fields: {
+                project: { key: $projectKey },
+                summary: $summary,
+                description: {
+                  type: "doc",
+                  version: 1,
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [
+                        { type: "text", text: "GitHub Issue: " },
+                        {
+                          type: "text",
+                          text: $url,
+                          marks: [ { type: "link", attrs: { href: $url } } ]
+                        }
+                      ]
+                    },
+                    { type: "paragraph" },
+                    {
+                      type: "paragraph",
+                      content: (
+                        if ($body | length) > 0
+                        then [ { type: "text", text: $body } ]
+                        else [ { type: "text", text: "(no description provided in GitHub issue)" } ]
+                        end
+                      )
+                    }
+                  ]
+                },
+                issuetype: { name: "Task" }
+              }
+            }'
+          )
+
+          # Capture body and status separately (avoid string matching on combined output)
+          HTTP_STATUS=$(curl -sS -o response.json -w "%{http_code}" -X POST \
             -u "$JIRA_EMAIL:$JIRA_API_TOKEN" \
             -H "Content-Type: application/json" \
-            --data "$(jq -n \
-              --arg project_key "$JIRA_PROJECT_KEY" \
-              --arg summary "${{ github.event.issue.title }}" \
-              --arg url "$ISSUE_URL" \
-              --argjson body "$ISSUE_BODY" \
-              '{
-                fields: {
-                  project: { key: $project_key },
-                  summary: $summary,
-                  description: {
-                    type: "doc",
-                    version: 1,
-                    content: [
-                      {
-                        type: "paragraph",
-                        content: [
-                          { type: "text", text: "GitHub Issue: " },
-                          { type: "text", text: $url, marks: [{ type: "link", attrs: { href: $url } }] }
-                        ]
-                      },
-                      {
-                        type: "paragraph",
-                        content: [
-                          { type: "text", text: $body }
-                        ]
-                      }
-                    ]
-                  },
-                  issuetype: { name: "Task" }
-                }
-              }')" \
-            $JIRA_BASE_URL/rest/api/3/issue)
+            --data "$ISSUE_JSON" \
+            "$JIRA_BASE_URL/rest/api/3/issue")
 
-          echo "$RESPONSE"
+          echo "HTTP_STATUS=$HTTP_STATUS"
+          cat response.json || true
 
-          if [[ "$RESPONSE" != *"HTTP_STATUS:201"* ]]; then
+          if [[ "$HTTP_STATUS" != "201" ]]; then
             echo "❌ Failed to create Jira ticket"
             exit 1
           fi
