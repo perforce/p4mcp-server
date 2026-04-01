@@ -4,100 +4,43 @@ on:
   issues:
     types: [opened]
 
-permissions:
-  contents: read
-
 jobs:
   create-jira-ticket:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Create Jira Issue
-        shell: bash
+      - name: Login to Jira
+        uses: atlassian/gajira-login@v3
         env:
-          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
-          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
-          JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}
-        run: |
-          set -euo pipefail
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
 
-          echo "Creating Jira ticket..."
+      - name: Create Jira issue
+        id: create
+        uses: atlassian/gajira-create@v3
+        with:
+          project: ${{ secrets.JIRA_PROJECT_KEY }}
+          issuetype: Bug
+          summary: "[GH-${{ github.event.issue.number }}] ${{ github.event.issue.title }}"
+          description: |
+            *Reported via GitHub Issue:* [${{ github.event.issue.html_url }}|${{ github.event.issue.html_url }}]
 
-          # Basic sanity checks (fail fast with clear errors)
-          : "${JIRA_EMAIL:?Missing secret JIRA_EMAIL}"
-          : "${JIRA_API_TOKEN:?Missing secret JIRA_API_TOKEN}"
-          : "${JIRA_BASE_URL:?Missing secret JIRA_BASE_URL}"
-          : "${JIRA_PROJECT_KEY:?Missing secret JIRA_PROJECT_KEY}"
+            *Reporter:* ${{ github.event.issue.user.login }}
 
-          # Normalize base URL to avoid accidental double slashes
-          JIRA_BASE_URL="${JIRA_BASE_URL%/}"
+            *Description:*
+            ${{ github.event.issue.body }}
+          fields: >-
+            {
+              "labels": ["github-issue"]
+            }
 
-          ISSUE_TITLE='${{ github.event.issue.title }}'
-          ISSUE_URL='${{ github.event.issue.html_url }}'
-
-          # Body can be null/empty; normalize it so jq doesn't get "null"
-          ISSUE_BODY='${{ github.event.issue.body }}'
-          if [[ "$ISSUE_BODY" == "null" ]]; then
-            ISSUE_BODY=""
-          fi
-
-          # Build Atlassian Document Format (ADF) rich text for description
-          # This creates a linked URL paragraph plus the issue body as text.
-          ISSUE_JSON=$(jq -n \
-            --arg projectKey "${JIRA_PROJECT_KEY}" \
-            --arg summary "${ISSUE_TITLE}" \
-            --arg url "${ISSUE_URL}" \
-            --arg body "${ISSUE_BODY}" \
-            '{
-              fields: {
-                project: { key: $projectKey },
-                summary: $summary,
-                description: {
-                  type: "doc",
-                  version: 1,
-                  content: [
-                    {
-                      type: "paragraph",
-                      content: [
-                        { type: "text", text: "GitHub Issue: " },
-                        {
-                          type: "text",
-                          text: $url,
-                          marks: [ { type: "link", attrs: { href: $url } } ]
-                        }
-                      ]
-                    },
-                    { type: "paragraph" },
-                    {
-                      type: "paragraph",
-                      content: (
-                        if ($body | length) > 0
-                        then [ { type: "text", text: $body } ]
-                        else [ { type: "text", text: "(no description provided in GitHub issue)" } ]
-                        end
-                      )
-                    }
-                  ]
-                },
-                issuetype: { name: "Task" }
-              }
-            }'
-          )
-
-          # Capture body and status separately (avoid string matching on combined output)
-          HTTP_STATUS=$(curl -sS -o response.json -w "%{http_code}" -X POST \
-            -u "$JIRA_EMAIL:$JIRA_API_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data "$ISSUE_JSON" \
-            "$JIRA_BASE_URL/rest/api/3/issue")
-
-          echo "HTTP_STATUS=$HTTP_STATUS"
-          cat response.json || true
-
-          if [[ "$HTTP_STATUS" != "201" ]]; then
-            echo "❌ Failed to create Jira ticket"
-            exit 1
-          fi
-
-          echo "✅ Jira ticket created successfully"
+      - name: Comment on GitHub issue with Jira link
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `A Jira ticket has been created: **[${{ steps.create.outputs.issue }}](${{ secrets.JIRA_BASE_URL }}/browse/${{ steps.create.outputs.issue }})**`
+            })
