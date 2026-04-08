@@ -1,5 +1,7 @@
 FROM python:3.12-slim
 
+LABEL io.modelcontextprotocol.server.name="io.github.perforce/p4mcp-server"
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
