@@ -3,6 +3,11 @@ import logging
 import argparse
 import signal
 from pathlib import Path
+try:
+    import truststore
+    truststore.inject_into_ssl()
+except ImportError:
+    pass  # truststore not installed; falling back to certifi CA bundle
 from src.telemetry.consent import consent_config_exist
 from src.logging.global_logging import setup_logging
 from src.logging.session_logging import start_session, end_session
