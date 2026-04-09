@@ -400,6 +400,9 @@ See the [Windsurf MCP documentation](https://docs.windsurf.com/windsurf/cascade/
 - `P4PORT` - P4 Server address. Examples: `ssl:perforce.example.com:1666`, `localhost:1666`
 - `P4USER` - Your P4 username
 - `P4CLIENT` - Your current P4 workspace. Optional, but recommended
+- `P4MCP_TLS_CA_MODE` - TLS certificate source mode.
+  - `system` (default): use OS trust store
+  - `certifi`: disable `truststore` injection and use default Python TLS certificate behavior
 
 ### Supported arguments
 

@@ -2,12 +2,8 @@ import sys
 import logging
 import argparse
 import signal
+import os
 from pathlib import Path
-try:
-    import truststore
-    truststore.inject_into_ssl()
-except ImportError:
-    pass  # truststore not installed; falling back to certifi CA bundle
 from src.telemetry.consent import consent_config_exist
 from src.logging.global_logging import setup_logging
 from src.logging.session_logging import start_session, end_session
@@ -19,6 +15,53 @@ sys.path.insert(0, str(project_root))
 from src.server import P4MCPServer
 
 logger = logging.getLogger(__name__)
+
+
+def configure_tls_ca_mode() -> None:
+    """Configure TLS certificate source based on P4MCP_TLS_CA_MODE.
+
+    Supported values:
+    - system (default): use OS certificate store via truststore
+    - certifi: disable truststore injection and use default Python behavior
+    """
+    raw_mode = os.getenv("P4MCP_TLS_CA_MODE", "system")
+    mode = raw_mode.strip().lower()
+
+    if mode == "":
+        mode = "system"
+        
+    if mode == "system":
+        try:
+            import truststore
+            truststore.inject_into_ssl()
+            logger.info("TLS CA mode: system (using OS trust store via truststore)")
+        except ImportError:
+            logger.warning(
+                "P4MCP_TLS_CA_MODE=system but truststore is not installed; "
+                "continuing with default Python TLS certificate behavior"
+            )
+        return
+
+    if mode == "certifi":
+        logger.info(
+            "TLS CA mode: certifi (truststore injection disabled; "
+            "using default Python TLS certificate behavior)"
+        )
+        return
+
+    logger.warning(
+        "Unrecognized P4MCP_TLS_CA_MODE=%r; defaulting to system",
+        raw_mode,
+    )
+    try:
+        import truststore
+        truststore.inject_into_ssl()
+        logger.info("TLS CA mode: system (using OS trust store via truststore)")
+    except ImportError:
+        logger.warning(
+            "Defaulted to system, but truststore is not installed; "
+            "continuing with default Python TLS certificate behavior"
+        )
 
 def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
@@ -71,6 +114,7 @@ def signal_handler(signum, frame):
 
 def main() -> None:
     setup_logging("INFO")
+    configure_tls_ca_mode()
 
     
     # Register signal handlers for graceful shutdown
