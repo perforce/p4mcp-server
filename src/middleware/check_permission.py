@@ -133,10 +133,6 @@ class CheckPermissionMiddleware(Middleware):
                 # Check tool-specific permissions
                 # await self._check_tool_permissions(tool_name, tool_info)
 
-                # Check if tool is enabled
-                if not tool.enabled:
-                    raise ToolError("Tool is currently disabled")
-
                 logger.info(f"Permission check passed for {tool_name} "
                             f"({tool_info['operation_type']} on {tool_info['toolset']})")
 
