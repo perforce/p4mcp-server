@@ -1,5 +1,7 @@
 FROM python:3.12-slim
 
+LABEL io.modelcontextprotocol.server.name="io.github.perforce/p4mcp-server"
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -20,7 +22,6 @@ COPY src/ ./src/
 ENV PYTHONPATH=/app
 ENV P4TICKETS=/home/mcpuser/.p4tickets
 
-RUN mkdir -p /app/logs && chown mcpuser:mcpuser /app/logs
-USER mcpuser
-# Run the server with HTTP transport
-CMD ["python3", "-m", "src.main", "--transport", "stdio"]
+# Run the server
+ENTRYPOINT ["python3", "-m", "src.main"]
+CMD ["--transport", "stdio"]
