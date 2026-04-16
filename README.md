@@ -82,6 +82,48 @@ cd p4-mcp-server-2025.2.0
 
 </details>
 
+<details><summary><b>Install via uvx or pip</b></summary>
+
+Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/) or pip.
+
+**uvx (no install required)**
+
+Run directly without a permanent install:
+
+```bash
+uvx p4mcp-server --readonly
+```
+
+**pip**
+
+```bash
+pip install p4mcp-server
+p4mcp-server --readonly
+```
+
+**MCP client configuration**
+
+```json
+{
+  "mcpServers": {
+    "perforce-p4-mcp": {
+      "command": "uvx",
+      "args": [
+        "p4mcp-server",
+        "--readonly"
+      ],
+      "env": {
+        "P4PORT": "ssl:perforce.example.com:1666",
+        "P4USER": "your_username",
+        "P4CLIENT": "your_workspace"
+      }
+    }
+  }
+}
+```
+
+</details>
+
 <details><summary><b>Build from source</b></summary>
 
 Requirements:

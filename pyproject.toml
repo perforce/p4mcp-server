@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "p4mcp-server"
+version = "2025.1.2830393"
+description = "Perforce P4 MCP Server - Model Context Protocol server for Perforce version control"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Perforce"}
+]
+keywords = ["perforce", "p4", "mcp", "version-control", "vcs"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Version Control",
+]
+
+dependencies = [
+    "fastmcp>=3.0.0",
+    "p4python>=2023.1",
+    "dataclasses-json>=0.5.7",
+    "pydantic>=2.0.0",
+    "python-json-logger>=2.0.0",
+    "pyyaml>=6.0",
+    "lupa>=2.0",
+    "requests>=2.0.0",
+]
+
+[project.scripts]
+p4mcp-server = "src.main:main"
+p4-mcp-server = "src.main:main"
+
+[tool.setuptools]
+packages = [
+    "src",
+    "src.core",
+    "src.handlers",
+    "src.logging",
+    "src.middleware",
+    "src.models",
+    "src.services",
+    "src.telemetry",
+]
+
+[tool.setuptools.package-data]
+"*" = ["*.txt", "*.md", "LICENSE.txt"]
