@@ -20,5 +20,6 @@ COPY src/ ./src/
 # Set environment variables
 ENV PYTHONPATH=/app
 
-# Run the server with HTTP transport
-CMD ["python3", "-m", "src.main", "--transport", "stdio"]
+# Run the server
+ENTRYPOINT ["python3", "-m", "src.main"]
+CMD ["--transport", "stdio"]
