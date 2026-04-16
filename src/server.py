@@ -110,7 +110,7 @@ class P4MCPServer:
     def _register_tools(self):
         """Register read-only tools (always available)"""
         
-        @self.mcp.tool(tags=["read", "server"])
+        @self.mcp.tool(tags=["read", "server"], annotations={"readOnlyHint": True})
         async def query_server(
             action: Annotated[Literal["server_info", "current_user"], Field(
                 description="Get server info or current user information"
@@ -123,7 +123,7 @@ class P4MCPServer:
             self.process_tool_logs("query_server", result, ctx)
             return result
         
-        @self.mcp.tool(tags=["read", "workspaces"], enabled="workspaces" in self.toolsets)
+        @self.mcp.tool(tags=["read", "workspaces"], enabled="workspaces" in self.toolsets, annotations={"readOnlyHint": True})
         async def query_workspaces(
             action: Annotated[Literal["list", "get", "type", "status"], Field(
                 description="Workspace query action"
@@ -157,7 +157,7 @@ class P4MCPServer:
             self.process_tool_logs("query_workspaces", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["read", "files"], enabled="files" in self.toolsets)
+        @self.mcp.tool(tags=["read", "files"], enabled="files" in self.toolsets, annotations={"readOnlyHint": True})
         async def query_files(
             action: Annotated[Literal["content", "history", "info", "metadata", "diff", "annotations"], Field(
                 description="File query action, metadata includes extra information like optional attributes and file size"
@@ -195,7 +195,7 @@ class P4MCPServer:
             self.process_tool_logs("query_files", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["read", "changelists"], enabled="changelists" in self.toolsets)
+        @self.mcp.tool(tags=["read", "changelists"], enabled="changelists" in self.toolsets, annotations={"readOnlyHint": True})
         async def query_changelists(
             action: Annotated[Literal["get", "list"], Field(
                 description="Changelist query action"
@@ -246,7 +246,7 @@ class P4MCPServer:
             self.process_tool_logs("query_changelists", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["read", "shelves"], enabled="shelves" in self.toolsets)
+        @self.mcp.tool(tags=["read", "shelves"], enabled="shelves" in self.toolsets, annotations={"readOnlyHint": True})
         async def query_shelves(
             action: Annotated[Literal["list", "diff", "files"], Field(
                 description="Shelve query action"
@@ -280,7 +280,7 @@ class P4MCPServer:
             self.process_tool_logs("query_shelves", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["read", "jobs"], enabled="jobs" in self.toolsets)
+        @self.mcp.tool(tags=["read", "jobs"], enabled="jobs" in self.toolsets, annotations={"readOnlyHint": True})
         async def query_jobs(
             action: Annotated[Literal["list_jobs", "get_job"], Field(
                 description="Job query action"
@@ -314,7 +314,7 @@ class P4MCPServer:
             self.process_tool_logs("query_jobs", result, ctx)
             return result
 
-        @self.mcp.tool(tags=["read", "reviews"], enabled="reviews" in self.toolsets)
+        @self.mcp.tool(tags=["read", "reviews"], enabled="reviews" in self.toolsets, annotations={"readOnlyHint": True})
         async def query_reviews(
             action: Annotated[Literal["list", "dashboard", "get", "transitions", "files_readby", "files", "comments", "activity"], Field(
                 description="Review query action: list all reviews, dashboard for current user, get specific review, transitions, files_readby, files, comments, activity"
