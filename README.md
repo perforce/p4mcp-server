@@ -131,7 +131,7 @@ Add the following to your `mcp.json`:
                 "-e", "P4PORT=ssl:perforce.example.com:1666",
                 "-e", "P4USER=your_username",
                 "-e", "P4CLIENT=your_workspace",
-                "-v", "/Users/your_username/.p4tickets:/root/.p4tickets:ro",
+                "-v", "/Users/your_username/.p4tickets:/home/mcpuser/.p4tickets:ro",
                 "p4-mcp-server"
             ]
         }
@@ -156,7 +156,7 @@ Add the following to your `mcp.json`:
 Using P4 tickets:
 ```bash
 # macOS/Linux
--v /Users/your_username/.p4tickets:/root/.p4tickets:ro
+-v /Users/your_username/.p4tickets:/home/mcpuser/.p4tickets:ro
 ```
 
 > **Note:** Use the full path to your tickets file (not `~`). After running `p4 login`, restart the MCP server to pick up the new ticket.
@@ -203,7 +203,7 @@ Example configuration with client root mounted:
                 "-e", "P4PORT=ssl:perforce.example.com:1666",
                 "-e", "P4USER=your_username",
                 "-e", "P4CLIENT=your_workspace",
-                "-v", "/Users/your_username/.p4tickets:/root/.p4tickets",
+                "-v", "/Users/your_username/.p4tickets:/home/mcpuser/.p4tickets",
                 "-v", "/path/to/client/root:/path/to/client/root",
                 "p4-mcp-server"
             ]

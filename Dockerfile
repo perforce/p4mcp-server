@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
+RUN useradd -m mcpuser
 # Set working directory
 WORKDIR /app
 
@@ -19,6 +20,7 @@ COPY src/ ./src/
 
 # Set environment variables
 ENV PYTHONPATH=/app
+ENV P4TICKETS=/home/mcpuser/.p4tickets
 
 # Run the server
 ENTRYPOINT ["python3", "-m", "src.main"]
