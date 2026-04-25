@@ -179,16 +179,14 @@ class WorkspaceServices:
                 client_spec = p4.fetch_client(workspace_name)
                 client_owner = client_spec["Owner"]
 
-                # Compare and update only if owner matches
-                if client_owner == current_user:
-                    client_spec = p4.fetch_client(workspace_name)
-                    for key in workspace_spec:
-                        if key.lower() in client_spec.__dict__["_Spec__fields"]:
-                            setattr(client_spec, f"_{key.lower()}", workspace_spec[key])
-                    p4.save_client(client_spec)
-                    return {"status": "success", "message": f"Workspace '{workspace_name}' owned by '{current_user}' updated successfully"}
-                else:
-                    return {"status": "failed", "message": f"Workspace '{workspace_name}' is owned by '{client_owner}', not  '{current_user}'"}
+                if client_owner != current_user:
+                    logger.warning(f"Workspace '{workspace_name}' is owned by '{client_owner}', not '{current_user}'. Proceeding anyway.")
+
+                for key in workspace_spec:
+                    if key.lower() in client_spec.__dict__["_Spec__fields"]:
+                        setattr(client_spec, f"_{key.lower()}", workspace_spec[key])
+                p4.save_client(client_spec)
+                return {"status": "success", "message": f"Workspace '{workspace_name}' updated successfully"}
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to update workspace '{workspace_name}': {e}")
                 return {"status": "error", "message": str(e)}
@@ -201,13 +199,11 @@ class WorkspaceServices:
                 client_spec = p4.fetch_client(workspace_name)
                 client_owner = client_spec["Owner"]
 
-                # Compare and delete only if owner matches
-                if client_owner == current_user:
-                    p4.run("client", "-d", workspace_name)
-                    return {"status": "success", "message": f"Workspace '{workspace_name}' owned by '{current_user}' deleted successfully"}
-                else:
-                    return {"status": "failed", "message": f"Workspace '{workspace_name}' is owned by '{client_owner}', not  '{current_user}'"}
-                
+                if client_owner != current_user:
+                    logger.warning(f"Workspace '{workspace_name}' is owned by '{client_owner}', not '{current_user}'. Proceeding anyway.")
+
+                p4.run("client", "-d", workspace_name)
+                return {"status": "success", "message": f"Workspace '{workspace_name}' deleted successfully"}
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to delete workspace '{workspace_name}': {e}")
                 return {"status": "error", "message": str(e)}
@@ -220,12 +216,11 @@ class WorkspaceServices:
                 client_spec = p4.fetch_client(workspace_name)
                 client_owner = client_spec["Owner"]
 
-                # Compare and switch only if owner matches
-                if client_owner == current_user:
-                    p4.client = workspace_name
-                    return {"status": "success", "message": f"Switched to workspace '{workspace_name}' owned by '{current_user}'"}
-                else:
-                    return {"status": "failed", "message": f"Workspace '{workspace_name}' is owned by '{client_owner}', not  '{current_user}'"}
+                if client_owner != current_user:
+                    logger.warning(f"Workspace '{workspace_name}' is owned by '{client_owner}', not '{current_user}'. Proceeding anyway.")
+
+                p4.client = workspace_name
+                return {"status": "success", "message": f"Switched to workspace '{workspace_name}'"}
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to switch to workspace '{workspace_name}': {e}")
                 return {"status": "error", "message": str(e)}

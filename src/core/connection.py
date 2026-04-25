@@ -13,7 +13,7 @@ from .config import Config
 
 logger = logging.getLogger(__name__)
 
-__version__ = "2025.2.2901372"
+__version__ = "2026.1.2933350"
 
 class P4Session:
     """Manages P4 session with tracking and logging"""

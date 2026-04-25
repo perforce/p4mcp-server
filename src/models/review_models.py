@@ -1,5 +1,5 @@
 from typing import Any, Dict, List, Optional
-from .models import BaseParams, PaginatedParams
+from .common import BaseParams, PaginatedParams
 from pydantic import Field, model_validator, field_validator
 from enum import Enum
 import re
@@ -41,13 +41,13 @@ class QueryReviewsParams(PaginatedParams):
     )
     review_id: Optional[int] = Field(
         default=None,
-        description="Review ID—required for get, transitions, files_readby, files,  comments, and activity actions",
+        description="Review ID—required for get, transitions, files_readby, files, comments, and activity actions",
         examples=[12345, 67890],
     )
-    review_fields: Optional[str] = Field(
+    fields: Optional[List[str]] = Field(
         default=None,
-        description="Comma-separated list of fields to return for list/get actions",
-        examples=["id,description,author,state", "id,author,state,participants,commits"],
+        description="List of fields to return for list/get actions",
+        examples=[["id", "description", "author", "state"], ["id", "author", "state", "participants", "commits"]],
     )
     comments_fields: Optional[str] = Field(
         default="id,body,user,time",
@@ -73,6 +73,47 @@ class QueryReviewsParams(PaginatedParams):
         default=10,
         description="Maximum number of results to return",
         examples=[10, 20, 50],
+    )
+    # v11 list filters
+    after: Optional[str] = Field(
+        default=None,
+        description="Review ID to seek to for pagination (list action). Reviews up to and including this ID are excluded.",
+        examples=["12344"],
+    )
+    after_updated: Optional[str] = Field(
+        default=None,
+        description="Return reviews updated on the day before this date/time in seconds since epoch (list action). Mutually exclusive with 'after'.",
+        examples=["1606233362"],
+    )
+    result_order: Optional[str] = Field(
+        default=None,
+        description="Set to 'updated' to return most recently updated reviews first (list action)",
+        examples=["updated"],
+    )
+    projects: Optional[List[str]] = Field(
+        default=None,
+        description="Filter by project name(s) (list action)",
+        examples=[["myproject"], ["myproject", "gemini"]],
+    )
+    state: Optional[List[str]] = Field(
+        default=None,
+        description="Filter by review state(s) (list action). Valid: needsRevision, needsReview, approved, approved:isPending, approved:commit, approved:notPending, rejected, archived",
+        examples=[["needsReview"], ["needsReview", "needsRevision", "approved:isPending"]],
+    )
+    keywords: Optional[str] = Field(
+        default=None,
+        description="Search keyword(s) to filter reviews (list action). Use with keywords_fields.",
+        examples=["bugfix", "12345"],
+    )
+    keywords_fields: Optional[List[str]] = Field(
+        default=None,
+        description="Fields to search keywords in (list action). Valid: changes, author, participants, hasReviewer, description, updated, projects, state, testStatus, pending, groups, id",
+        examples=[["description"], ["author"], ["changes"]],
+    )
+    include_transitions: Optional[bool] = Field(
+        default=None,
+        description="Include allowed state transitions in get action response",
+        examples=[True],
     )
 
     @model_validator(mode="after")

@@ -7,7 +7,6 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd -m mcpuser
 # Set working directory
 WORKDIR /app
 
@@ -18,10 +17,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY src/ ./src/
 
+# Create non-root user and setup permissions
+RUN useradd -u 1000 -m -s /bin/bash mcpuser && \
+    mkdir -p /app/logs && \
+    chown -R mcpuser:mcpuser /app/logs
+    
 # Set environment variables
 ENV PYTHONPATH=/app
 ENV P4TICKETS=/home/mcpuser/.p4tickets
+ 
+# Switch to non-root user
+USER mcpuser
 
-# Run the server
+# Run the serve
 ENTRYPOINT ["python3", "-m", "src.main"]
 CMD ["--transport", "stdio"]

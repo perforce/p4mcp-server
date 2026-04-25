@@ -45,7 +45,7 @@ DELETE endpoints:
 """
 
 import logging
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 from P4 import P4Exception
 
 import requests
@@ -63,7 +63,15 @@ class ReviewServices:
     Covers all major review endpoints from Swarm API 2025.2
     """
 
-    def __init__(self, connection_manager: P4ConnectionManager, verify_ssl: bool = True):
+    def __init__(self, connection_manager: P4ConnectionManager, verify_ssl: Union[bool, str] = True):
+        """
+        Args:
+            connection_manager: P4 connection manager.
+            verify_ssl: SSL verification for Swarm API requests.
+                True – verify with default CA bundle (default).
+                False – disable verification entirely.
+                str – path to a custom CA certificate bundle (PEM).
+        """
         self.connection_manager = connection_manager
         self.verify_ssl = verify_ssl
 

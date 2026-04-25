@@ -66,8 +66,8 @@ class GlobalLogger:
         else:
             log_file_path = Path(log_file)
             logs_dir = log_file_path.parent
-        
-        # Create logs directory and add rotating file handler
+
+        # Create logs directory and add rotating file handler   
         try:
             logs_dir.mkdir(exist_ok=True)
             global_handler = TimedRotatingFileHandler(

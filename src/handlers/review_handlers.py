@@ -22,14 +22,14 @@ class ReviewsHandlers:
         if params.action == "list":
             result = await self.review_services.list_reviews(
                 max_results=params.max_results,
-                after=getattr(params, "after", None),
-                after_updated=getattr(params, "after_updated", None),
-                result_order=getattr(params, "result_order", None),
-                projects=getattr(params, "projects", None),
-                state=getattr(params, "state", None),
-                keywords=getattr(params, "keywords", None),
-                keywords_fields=getattr(params, "keywords_fields", None),
-                fields=getattr(params, "fields", None)
+                after=params.after,
+                after_updated=params.after_updated,
+                result_order=params.result_order,
+                projects=params.projects,
+                state=params.state,
+                keywords=params.keywords,
+                keywords_fields=params.keywords_fields,
+                fields=params.fields,
             )
 
         elif params.action == "dashboard":
@@ -45,11 +45,10 @@ class ReviewsHandlers:
             )
 
         elif params.action == "get":
-            # get_review_info(review_id, fields, include_transitions)
             result = await self.review_services.get_review_info(
                 params.review_id,
-                getattr(params, "fields", None),
-                getattr(params, "include_transitions", False)
+                params.fields,
+                params.include_transitions or False,
             )
 
         elif params.action == "files_readby":

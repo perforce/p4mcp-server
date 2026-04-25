@@ -31,7 +31,7 @@ class CheckPermissionMiddleware(Middleware):
                 tool_info['operation_type'] = tag
                 tool_info['is_write_operation'] = tag in ['write', 'delete']
                 tool_info['is_delete_operation'] = tag == 'delete'
-            elif tag in ['server', 'files', 'workspaces', 'changelists', 'shelves', 'jobs']:
+            elif tag in ['server', 'files', 'workspaces', 'changelists', 'shelves', 'jobs', 'reviews', 'streams']:
                 tool_info['toolset'] = tag
 
         # Fallback to parsing tool name if tags don't provide enough info
@@ -128,14 +128,10 @@ class CheckPermissionMiddleware(Middleware):
                 await self._check_global_permissions(tool_info)
 
                 # Check toolset permissions
-                # await self._check_toolset_permissions(tool_info)
+                await self._check_toolset_permissions(tool_info)
 
                 # Check tool-specific permissions
-                # await self._check_tool_permissions(tool_name, tool_info)
-
-                # Check if tool is enabled
-                if not tool.enabled:
-                    raise ToolError("Tool is currently disabled")
+                await self._check_tool_permissions(tool_name, tool_info)
 
                 logger.info(f"Permission check passed for {tool_name} "
                             f"({tool_info['operation_type']} on {tool_info['toolset']})")

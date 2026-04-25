@@ -52,15 +52,6 @@ class SessionManager:
         except (json.JSONDecodeError, IOError, KeyError):
             return 'unknown'
     
-    def _get_public_ip(self) -> str:
-        """Get public IP address with error handling"""
-        try:
-            response = requests.get('https://api.ipify.org', timeout=SessionConfig.REQUEST_TIMEOUT)
-            response.raise_for_status()
-            return response.text.strip()
-        except (requests.RequestException, requests.Timeout):
-            return "unknown"
-    
     def get_user_details(self) -> Dict[str, Any]:
         """Get cached user details"""
         if self._user_details is None:
