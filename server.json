@@ -3,7 +3,7 @@
   "name": "io.github.perforce/p4mcp-server",
   "title": "Perforce P4 MCP Server",
   "description": "Perforce P4 MCP server: changelists, files, shelves, workspaces, jobs, code reviews, and streams.",
-  "version": "1.0.0",
+  "version": "2026.1.2933350",
   "repository": {
     "source": "github",
     "url": "https://github.com/perforce/p4mcp-server"
@@ -11,7 +11,7 @@
   "packages": [
     {
       "registryType": "oci",
-      "identifier": "ghcr.io/perforce/p4mcp-server:1.0.0",
+      "identifier": "ghcr.io/perforce/p4mcp-server:2026.1.2933350",
       "runtime": {
         "name": "docker"
       },
