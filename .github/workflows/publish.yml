@@ -65,3 +65,10 @@ jobs:
 
       - name: Publish to MCP registry
         run: ./mcp-publisher publish
+        
+      - name: Make package public
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api --method PUT /orgs/perforce/packages/container/p4mcp-server/visibility \
+            -f visibility=public
