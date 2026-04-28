@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/perforce-p4mcp-server-badge.png)](https://mseep.ai/app/perforce-p4mcp-server)
+
 
 <p align="center">
   <img src="./icons/logo-p4mcp-reg.svg" alt="Perforce P4 MCP Server" width="480" />
