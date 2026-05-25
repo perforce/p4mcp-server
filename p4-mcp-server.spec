@@ -12,12 +12,12 @@ fastmcp_dist_info = dist._path
 rich_unicode_imports = collect_submodules('rich._unicode_data')
 
 if sys.platform.startswith("win"):
-    consent_ui = "src/telemetry/P4MCP.exe"
+    consent_ui = "p4mcp/telemetry/P4MCP.exe"
 else:
-    consent_ui = "src/telemetry/P4MCP"
+    consent_ui = "p4mcp/telemetry/P4MCP"
 
 a = Analysis(
-    ['src/main.py'],
+    ['p4mcp/main.py'],
     pathex=["."],
     binaries=[],
     datas=[

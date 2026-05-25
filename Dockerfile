@@ -15,7 +15,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY src/ ./src/
+COPY p4mcp/ ./p4mcp/
 
 # Create non-root user and setup permissions
 RUN useradd -u 1000 -m -s /bin/bash mcpuser && \
@@ -30,5 +30,5 @@ ENV P4TICKETS=/home/mcpuser/.p4tickets
 USER mcpuser
 
 # Run the serve
-ENTRYPOINT ["python3", "-m", "src.main"]
+ENTRYPOINT ["python3", "-m", "p4mcp.main"]
 CMD ["--transport", "stdio"]

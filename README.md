@@ -61,7 +61,30 @@
 | **Python** | 3.11+ *(required only for building from source)* |
 
 ## Local P4 MCP Server Installation
-<details><summary><b>Pre-built binaries (recommended)</b></summary>
+<details><summary><b>uvx (easiest, no install required)</b></summary>
+
+If you have [uv](https://docs.astral.sh/uv/) installed, you can run P4 MCP Server directly without any manual installation:
+
+```bash
+# Run the server
+uvx p4mcp-server
+
+# Check version
+uvx p4mcp-server --version
+
+# Run with arguments
+uvx p4mcp-server --readonly --allow-usage
+```
+
+This automatically fetches and runs the latest version from PyPI. No Python virtual environment setup or dependency management needed.
+
+**Requirements:**
+- [uv](https://docs.astral.sh/uv/) installed on your system
+- Python 3.11+ (uv will handle this automatically)
+
+</details>
+
+<details><summary><b>Pre-built binaries (recommended for offline/air-gapped)</b></summary>
 
 Download the appropriate binary for your operating system:
 - **macOS**: [p4-mcp-server-mac.zip](https://github.com/perforce/p4mcp-server/releases/latest/download/p4-mcp-server-mac.zip)
@@ -306,7 +329,7 @@ docker run --rm -p 8000:8000 \
   -e P4USER=your_username \
   -e P4PASSWD=YOUR_TICKET \
   ghcr.io/perforce/p4mcp-server:latest \
-  python3 -m src.main --readonly --transport http --port 8000
+  python3 -m p4mcp.main --readonly --transport http --port 8000
 ```
 
 **Configure the MCP client:**
@@ -331,7 +354,31 @@ Add the following to your `mcp.json`:
 ## MCP client configuration
 
 > **Note:** In all configuration examples below, if `P4CONFIG` is set, you do not need to set any environment variables in the `env` block. The server will use the configuration from the specified P4CONFIG file instead.
-> <details> <summary><strong>Server configuration example</strong></summary>
+
+> **Tip:** If you have [uv](https://docs.astral.sh/uv/) installed, you can use `uvx p4mcp-server` instead of `/absolute/path/to/p4-mcp-server` in the `command` field. This eliminates the need to download or build binaries manually.
+> <details> <summary><strong>Server configuration example using uvx</strong></summary>
+>
+>  ```json
+>{
+>   "mcpServers": {
+>      "perforce-p4-mcp": {
+>         "command": "uvx",
+>         "args": [
+>            "p4mcp-server",
+>            "--readonly", "--allow-usage"
+>         ],
+>         "env": {
+>            "P4PORT": "ssl:perforce.example.com:1666",
+>            "P4USER": "your_username",
+>            "P4CLIENT": "your_workspace"
+>         }
+>      }
+>    }
+>}
+>```
+></details>
+>
+> <details> <summary><strong>Server configuration example using binary path</strong></summary>
 >
 >  ```json
 >{
@@ -363,6 +410,27 @@ See the [JetBrains AI Assistant VCS Integration documentation](https://www.jetbr
 
 See the [Claude Code MCP docs](https://docs.anthropic.com/en/docs/claude-code/mcp) for more information.
 
+**Using uvx (no installation required):**
+```json
+{
+  "mcpServers": {
+    "perforce-p4-mcp": {
+      "command": "uvx",
+      "args": [
+        "p4mcp-server",
+        "--readonly", "--allow-usage"
+      ],
+      "env": {
+        "P4PORT": "ssl:perforce.example.com:1666",
+        "P4USER": "your_username",
+        "P4CLIENT": "your_workspace"
+      }
+    }
+  }
+}
+```
+
+**Using pre-built binary:**
 ```json
 {
   "mcpServers": {
@@ -507,6 +575,9 @@ See the [Windsurf MCP documentation](https://docs.windsurf.com/windsurf/cascade/
 - `P4USER` - Your P4 username
 - `P4CLIENT` - Your current P4 workspace. Optional, but recommended
 
+### Logging environment variables
+- `P4MCP_LOG_DIR` - Directory for log files. Default: `logs/` in the server executable's directory. Can be overridden by the `--log-dir` CLI argument.
+
 ### SSL/TLS environment variables
 - `P4MCP_TLS_CA_MODE` - TLS certificate source mode.
   - `system` (default): use OS trust store via `truststore`. **Note:** In this mode, `truststore` overrides the `verify=` parameter — custom CA bundles set via `P4MCP_CA_BUNDLE` or `--ca-bundle` are ignored. To use a custom CA bundle, set `P4MCP_TLS_CA_MODE=certifi`.
@@ -548,6 +619,14 @@ See the [Windsurf MCP documentation](https://docs.windsurf.com/windsurf/cascade/
   - If both `--ca-bundle` and `--ssl-no-verify` are provided, `--ca-bundle` takes priority (verification is performed using the specified bundle).
 
   > **Priority order:** `--ca-bundle` > `--ssl-no-verify` > `P4MCP_CA_BUNDLE` > `P4MCP_SSL_VERIFY` > default (`true`). CLI args take priority over environment variables.
+
+- `--log-dir <path>` - Directory for log files.
+  - Specify a custom directory for log files (both application and session logs).
+  - Default: `logs/` in the server executable's directory.
+  - Can also be set via `P4MCP_LOG_DIR` environment variable.
+  - CLI argument takes priority over environment variable.
+
+  > **Priority order:** `--log-dir` > `P4MCP_LOG_DIR` > default (`logs/` in the server executable's directory).
 
 ### Required configurations
 - Use absolute paths for the `command` field in all configurations.
@@ -880,8 +959,10 @@ The MCP server checks properties in this order. Each property is resolved indepe
   - `metadata` - Get file metadata (attributes, filesize, etc.)
   - `diff` - Compare file versions (depot-to-depot or mixed)
   - `annotations` - Get file annotations with blame information
-- **Parameters**: `file_path`, `file2` (for diff), `max_results`, `diff2` (boolean)
-- **Use cases**: Code analysis, file comparison, history tracking, blame analysis
+  - `search` - Search for files by name pattern (wildcard matching)
+  - `grep` - Search for files by content pattern (text search)
+- **Parameters**: `file_path`, `file2` (for diff), `pattern` (for search/grep), `case_insensitive` (for grep), `max_results`, `diff2` (boolean)
+- **Use cases**: Code analysis, file comparison, history tracking, blame analysis, file discovery, content search
 
 </details>
 

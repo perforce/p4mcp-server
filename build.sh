@@ -11,7 +11,7 @@ PYTHON_CMD="python3"
 
 # --- Version configuration ---
 if [ -z "$RELEASE_VERSION" ]; then
-    CONNECTION_FILE="$SCRIPT_DIR/src/core/connection.py"
+    CONNECTION_FILE="$SCRIPT_DIR/p4mcp/core/connection.py"
 
     if [ -f "$CONNECTION_FILE" ]; then
         VER_RAW=$(grep -E '^__version__ *= *' "$CONNECTION_FILE" | cut -d '=' -f2- | xargs)
@@ -148,16 +148,16 @@ build_executable() {
         log_info "Removing existing P4MCP.spec..."
         rm -f "P4MCP.spec"
     fi
-    if [ -f "src/telemetry/P4MCP" ]; then
+    if [ -f "p4mcp/telemetry/P4MCP" ]; then
         log_info "Removing existing P4MCP binary..."
-        rm -f "src/telemetry/P4MCP"
+        rm -f "p4mcp/telemetry/P4MCP"
     fi
 
     # Build standalone binary for consent_ui.py
     log_info "Building standalone binary for consent_ui.py..."
-    pyinstaller --onefile --distpath src/telemetry --name "P4MCP" src/telemetry/consent_ui.py
-    if [ -f "src/telemetry/P4MCP" ]; then
-        log_success "Standalone P4MCP binary created at src/telemetry/P4MCP"
+    pyinstaller --onefile --distpath p4mcp/telemetry --name "P4MCP" p4mcp/telemetry/consent_ui.py
+    if [ -f "p4mcp/telemetry/P4MCP" ]; then
+        log_success "Standalone P4MCP binary created at p4mcp/telemetry/P4MCP"
     else
         log_error "Failed to build consent_ui binary"
         exit 1
@@ -206,7 +206,7 @@ create_package() {
         log_info "Package size: $ARCHIVE_SIZE"
         # Clean up build, dist directories and P4MCP.spec and P4MCP binary after successful packaging
         rm -rf build/ dist/ "$VENV_DIR"
-        rm -f "P4MCP.spec" "src/telemetry/P4MCP"
+        rm -f "P4MCP.spec" "p4mcp/telemetry/P4MCP"
         log_info "build/dist and .venv directories cleaned up after packaging!"
     else
         log_error "Failed to create package!"

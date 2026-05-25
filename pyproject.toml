@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "p4mcp-server"
+version = "1.0.0"
+description = "P4 MCP Server - Model Context Protocol server for Perforce P4 version control"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Perforce Software"},
+]
+keywords = ["perforce", "p4", "mcp", "model-context-protocol", "version-control"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Version Control",
+]
+
+dependencies = [
+    "certifi==2026.4.22",
+    "fastmcp==3.3.1",
+    "httpx==0.28.1",
+    "p4python==2025.2.2863679",
+    "pydantic==2.13.4",
+    "pydantic-settings==2.14.1",
+    "requests==2.34.2",
+    "truststore==0.10.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.3",
+    "pytest-asyncio==1.3.0",
+]
+
+[project.scripts]
+p4mcp = "p4mcp.main:main"
+p4mcp-server = "p4mcp.main:main"
+
+[project.urls]
+Homepage = "https://github.com/perforce/p4mcp-server"
+Repository = "https://github.com/perforce/p4mcp-server"
+Issues = "https://github.com/perforce/p4mcp-server/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["p4mcp*"]
+
+[tool.setuptools]
+include-package-data = true
+license-files = ["LICENSE.txt", "THIRD-PARTY-NOTICES.txt"]

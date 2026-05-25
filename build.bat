@@ -32,7 +32,7 @@ set "SCRIPT_DIR=%~dp0"
 REM REM Version configuration
 if "%RELEASE_VERSION%"=="" (
     
-    set CONNECTION_FILE=%SCRIPT_DIR%src\core\connection.py
+    set CONNECTION_FILE=%SCRIPT_DIR%p4mcp\core\connection.py
     
     if exist "!CONNECTION_FILE!" (
         set "VER_RAW="
@@ -267,21 +267,21 @@ if exist "P4MCP.spec" (
     call :log_info "Removing existing P4MCP.spec..."
     del "P4MCP.spec"
 )
-if exist "src\telemetry\P4MCP.exe" (
+if exist "p4mcp\telemetry\P4MCP.exe" (
     call :log_info "Removing existing P4MCP binary..."
-    del "src\telemetry\P4MCP.exe"
+    del "p4mcp\telemetry\P4MCP.exe"
 )
 
 REM Build standalone binary for consent_ui.py
 call :log_info "Building standalone binary for consent_ui.py..."
-"%VENV_DIR%\Scripts\python.exe" -m PyInstaller --onefile --noconsole --distpath src\telemetry --name "P4MCP" src\telemetry\consent_ui.py 
+"%VENV_DIR%\Scripts\python.exe" -m PyInstaller --onefile --noconsole --distpath p4mcp\telemetry --name "P4MCP" p4mcp\telemetry\consent_ui.py 
 if errorlevel 1 (
     call :log_error "Failed to build consent_ui binary"
     exit /b 1
 )
 
-if exist "src\telemetry\P4MCP.exe" (
-    call :log_success "Standalone P4MCP binary created at src\telemetry\P4MCP.exe"
+if exist "p4mcp\telemetry\P4MCP.exe" (
+    call :log_success "Standalone P4MCP binary created at p4mcp\telemetry\P4MCP.exe"
 ) else (
     call :log_error "Failed to build consent_ui binary"
     exit /b 1
@@ -357,7 +357,7 @@ if exist "%ARCHIVE_PATH%" (
     if exist "dist" rmdir /s /q "dist"
     if exist ".venv" rmdir /s /q ".venv"
     if exist "P4MCP.spec" del "P4MCP.spec"
-    if exist "src\telemetry\P4MCP.exe" del "src\telemetry\P4MCP.exe"
+    if exist "p4mcp\telemetry\P4MCP.exe" del "p4mcp\telemetry\P4MCP.exe"
     call :log_info "build/dist and .venv directories cleaned up after packaging!"
 ) else (
     call :log_error "Failed to create package!"

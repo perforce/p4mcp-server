@@ -17,6 +17,8 @@ Use the `query_files` and `modify_files` tools to work with files in P4 depots.
 | `metadata` | Get extended file metadata | `file_path` |
 | `diff` | Compare file revisions or depot vs workspace | `file_path`, `file2`, `diff2` |
 | `annotations` | Get per-line blame/annotation | `file_path` |
+| `search` | Search for files by name pattern (wildcard) | `file_path`, `pattern`, `max_results` |
+| `grep` | Search for files by content pattern | `file_path`, `pattern`, `case_insensitive`, `max_results` |
 
 ## Modifying Files
 
@@ -53,6 +55,12 @@ Use the `query_files` and `modify_files` tools to work with files in P4 depots.
 2. `query_files` → `diff` to compare specific revisions
 3. `query_files` → `annotations` to see per-line authorship
 4. `query_files` → `content` to read a specific revision
+
+### Find files by name or content
+
+1. `query_files` → `search` with a wildcard pattern (e.g., `*.py`) to find files by name
+2. `query_files` → `grep` with a text pattern to find files containing specific content
+3. Use `query_files` → `content` to read files found from search results
 
 ### Sync and resolve conflicts
 
