@@ -15,9 +15,9 @@ logger = logging.getLogger(__name__)
 class P4MCPServer:
     """Perforce MCP Server with improved structure"""
 
-    def __init__(self, session_id: str = None, readonly: bool = True, toolsets: list = [], search_transform: str = None, ssl_verify=None, log_dir: str = None, max_results=None, max_scan_rows=None):
+    def __init__(self, session_id: str = None, readonly: bool = True, toolsets: list = None, search_transform: str = None, ssl_verify=None, log_dir: str = None, max_results=None, max_scan_rows=None):
         self.readonly = readonly
-        self.toolsets = toolsets
+        self.toolsets = toolsets or []
         self.session_id = session_id
         self.search_transform = search_transform
 
