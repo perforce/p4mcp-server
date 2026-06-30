@@ -55,6 +55,16 @@ class QueryChangelistsParams(PaginatedParams):
         description="Filter by depot path - for list action",
         examples=["//depot/my_workspace/..."]
     )
+    max_results: Optional[int] = Field(
+        default=None,
+        ge=1,
+        le=1000,
+        description=(
+            "Maximum number of results to return (max 1000). When set, bounds "
+            "the 'list' action and also caps open files for get('default') via "
+            "'p4 opened -m N'. Omit for unbounded results."
+        )
+    )
 
     @model_validator(mode='after')
     def validate_changelist_id_required(self):

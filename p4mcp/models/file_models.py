@@ -61,6 +61,17 @@ class QueryFilesParams(PaginatedParams):
         description="Case-insensitive matching for grep action",
         examples=[True, False]
     )
+    max_results: Optional[int] = Field(
+        default=None,
+        ge=1,
+        le=1000,
+        description=(
+            "Maximum number of results to return (max 1000). When set, bounds "
+            "list-style actions (history/search/grep) and also caps fstat "
+            "(info/metadata) via 'p4 fstat -m N'. Omit for unbounded "
+            "info/metadata results."
+        )
+    )
 
     @model_validator(mode='after')
     def validate_diff_params(self):

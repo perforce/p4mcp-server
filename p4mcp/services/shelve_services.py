@@ -76,9 +76,9 @@ class ShelveServices:
         async with self.connection_manager.get_connection() as p4:
             try:
                 if force:
-                    shelved = p4.run("shelve", "-f", "-c", changelist_id, *files)
+                    shelved = p4.run_shelve("-f", "-c", changelist_id, *files)
                 else:
-                    shelved = p4.run("shelve", "-c", changelist_id, *files)
+                    shelved = p4.run_shelve("-c", changelist_id, *files)
                 return {"status": "success", "message": shelved}
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to shelve files in changelist '{changelist_id}': {e}")
@@ -101,10 +101,10 @@ class ShelveServices:
         """Delete a shelved changelist"""
         async with self.connection_manager.get_connection() as p4:
             try:
-                args = ["shelve", "-d", "-c", changelist_id]
+                args = ["-d", "-c", changelist_id]
                 if files:
                     args.extend(files)
-                result = p4.run(*args)
+                result = p4.run_shelve(*args)
                 return {"status": "success", "message": result}
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to delete shelve '{changelist_id}': {e}")
@@ -115,9 +115,9 @@ class ShelveServices:
         async with self.connection_manager.get_connection() as p4:
             try:
                 if force:
-                    updated = p4.run("shelve", "-f", "-c", changelist_id, *files)
+                    updated = p4.run_shelve("-f", "-c", changelist_id, *files)
                 else:
-                    updated = p4.run("shelve", "-c", changelist_id, *files)
+                    updated = p4.run_shelve("-c", changelist_id, *files)
                 return {"status": "success", "message": updated}
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to update shelve '{changelist_id}': {e}")

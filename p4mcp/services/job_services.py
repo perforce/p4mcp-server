@@ -34,8 +34,6 @@ class JobServices:
                     raise ValueError(f"Changelist '{changelist_id}' not found")
                 if changelist_id and changelist_id == "default":
                     raise ValueError("Cannot get jobs for default changelist")
-                if not await ChangelistServices.verify_changelist(p4, changelist_id):
-                    raise ValueError(f"Changelist '{changelist_id}' does not exist or is not valid for update")
                 result = p4.run("fixes", f"-m{limit}", "-c", changelist_id)
                 return {"status": "success", "message": result}
             except P4Exception as e:

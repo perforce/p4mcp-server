@@ -22,10 +22,10 @@ Write service for tools:
 """
 
 import logging
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from P4 import P4Exception
 
-from ..core.connection import P4ConnectionManager
+from ..core.connection import P4ConnectionManager, clamp_to_maxresults
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +38,56 @@ RESOLVE_MODE_FLAGS = {
     "yours": "-ay",
 }
 
+
+def _join_print_result(result: List[Any]) -> Dict[str, Any]:
+    metadata: List[Dict[str, Any]] = []
+    fragments: List[str] = []
+    for entry in result:
+        if isinstance(entry, dict):
+            metadata.append(entry)
+            continue
+        if isinstance(entry, (bytes, bytearray)):
+            fragments.append(entry.decode("utf-8", errors="replace"))
+        else:
+            fragments.append(str(entry))
+    return {"content": "".join(fragments), "metadata": metadata}
+
+
+def _serialize_depot_file(depot_file: Any) -> Dict[str, Any]:
+    revisions: List[Dict[str, Any]] = []
+
+    for rev in getattr(depot_file, "revisions", None) or []:
+        time_value = getattr(rev, "time", None)
+
+        integrations: List[Dict[str, Any]] = []
+        for integ in getattr(rev, "integrations", None) or []:
+            integrations.append({
+                "how": getattr(integ, "how", None),
+                "file": getattr(integ, "depotFile", None),
+                "srev": getattr(integ, "srev", None),
+                "erev": getattr(integ, "erev", None),
+            })
+
+        revisions.append({
+            "depotFile": getattr(depot_file, "depotFile", None),
+            "rev": getattr(rev, "rev", None),
+            "change": getattr(rev, "change", None),
+            "action": getattr(rev, "action", None),
+            "type": getattr(rev, "type", None),
+            "time": str(time_value) if time_value is not None else None,
+            "user": getattr(rev, "user", None),
+            "client": getattr(rev, "client", None),
+            "desc": getattr(rev, "desc", None),
+            "digest": getattr(rev, "digest", None),
+            "fileSize": getattr(rev, "fileSize", None),
+            "integrations": integrations,
+        })
+
+    return {
+        "depotFile": getattr(depot_file, "depotFile", None),
+        "revisions": revisions,
+    }
+
 class FileServices:
     """File services for file operations"""
     
@@ -45,45 +95,80 @@ class FileServices:
         self.connection_manager = connection_manager
 
     async def get_file_content(self, file_path: str) -> str:
-        """Get content of a file in the depot"""
+        """Get content of a file in the depot."""
         async with self.connection_manager.get_connection() as p4:
             try:
-                content = p4.run("print", file_path)
-                return {"status": "success", "message": content}
+                result = p4.run_print(file_path)
+                joined = _join_print_result(result)
+                return {"status": "success", "message": joined["content"], "metadata": joined["metadata"]}
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to get file content '{file_path}': {e}")
-                return {"status": "error", "message": str(e)}
+                return {"status": "error", "message": str(e), "metadata": []}
 
     async def get_file_history(self, file_path: str, limit: int=100) -> List[Dict[str, Any]]:
-        """Get history of a file in the depot"""
+        """Get history of a file in the depot."""
         async with self.connection_manager.get_connection() as p4:
             try:
-                history = p4.run("filelog", f"-m{limit}", file_path)
-                return {"status": "success", "message": [entry for entry in history if isinstance(entry, dict)]}
+                history = p4.run_filelog(f"-m{limit}", file_path)
+                return {"status": "success", "message": [_serialize_depot_file(entry) for entry in history]}
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to get file history '{file_path}': {e}")
                 return {"status": "error", "message": str(e)}
 
-    async def get_file_info(self, file_path: str) -> Dict[str, Any]:
-        """Get information about a file in the depot"""
+    async def get_file_info(self, file_path: str, max_results: Optional[int] = None) -> Dict[str, Any]:
+        """Get information about a file in the depot
+
+        Args:
+            file_path: Depot or local file path to stat.
+            max_results: Optional upper bound on returned file entries. When set,
+                'p4 fstat -m N' is issued (N before the path). Must be >= 1.
+        """
+        if max_results is not None and max_results < 1:
+            raise ValueError("max_results must be a positive integer")
         async with self.connection_manager.get_connection() as p4:
             try:
-                file_info = p4.run("fstat", file_path)
+                args = ["fstat"]
+                note = None
+                if max_results is not None:
+                    effective, note = clamp_to_maxresults(p4, max_results)
+                    args.extend(["-m", str(effective)])
+                args.append(file_path)
+                file_info = p4.run(*args)
                 if not file_info:
-                    raise ValueError(f"File '{file_path}' not found")
-                return {"status": "success", "message": file_info}
+                    return {"status": "not_found", "message": f"File '{file_path}' not found"}
+                response = {"status": "success", "message": file_info}
+                if note:
+                    response["note"] = note
+                return response
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to get file info '{file_path}': {e}")
                 return {"status": "error", "message": str(e)}
 
-    async def get_file_metadata(self, file_path: str) -> Dict[str, Any]:
-        """Get metadata about a file in the depot"""
+    async def get_file_metadata(self, file_path: str, max_results: Optional[int] = None) -> Dict[str, Any]:
+        """Get metadata about a file in the depot
+
+        Args:
+            file_path: Depot or local file path to stat.
+            max_results: Optional upper bound on returned file entries. When set,
+                'p4 fstat -Oal -m N' is issued (N before the path). Must be >= 1.
+        """
+        if max_results is not None and max_results < 1:
+            raise ValueError("max_results must be a positive integer")
         async with self.connection_manager.get_connection() as p4:
             try:
-                file_metadata = p4.run("fstat", "-Oal", file_path)
+                args = ["fstat", "-Oal"]
+                note = None
+                if max_results is not None:
+                    effective, note = clamp_to_maxresults(p4, max_results)
+                    args.extend(["-m", str(effective)])
+                args.append(file_path)
+                file_metadata = p4.run(*args)
                 if not file_metadata:
-                    raise ValueError(f"File '{file_path}' not found")
-                return {"status": "success", "message": file_metadata}
+                    return {"status": "not_found", "message": f"File '{file_path}' not found"}
+                response = {"status": "success", "message": file_metadata}
+                if note:
+                    response["note"] = note
+                return response
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to get file metadata '{file_path}': {e}")
                 return {"status": "error", "message": str(e)}
@@ -185,13 +270,13 @@ class FileServices:
                     args.append("-f")
                 args.extend(file_paths)
                 result = p4.run(*args)
+                # Under exception_level=1 a benign "file(s) up-to-date" outcome
+                # no longer raises; it is surfaced via the additive top-level
+                # `warnings` field instead of being reported as an error here.
                 return {"status": "success", "message": result}
             except P4Exception as e:
-                if "File(s) up-to-date" in str(e):
-                    return {"status": "success", "message": "Workspace is already up-to-date"}
-                else:
-                    logger.error(f"P4Error: Failed to sync files: {e}")
-                    return {"status": "error", "message": str(e)}
+                logger.error(f"P4Error: Failed to sync files: {e}")
+                return {"status": "error", "message": str(e)}
 
     async def add_files(self, file_paths: List[str], changelist: str) -> Dict[str, Any]:
         """Add files to depot"""
@@ -265,8 +350,8 @@ class FileServices:
         """Resolve file conflicts"""
         async with self.connection_manager.get_connection() as p4:
             try:
-                
-                args = ["resolve"]
+
+                args = []
                 if mode:
                     if mode in RESOLVE_MODE_FLAGS:
                         args.append(RESOLVE_MODE_FLAGS[mode])
@@ -276,7 +361,7 @@ class FileServices:
                     args.extend(["-c", changelist])
                 if len(file_paths) > 0:
                     args.extend(file_paths)
-                result = p4.run(*args)
+                result = p4.run_resolve(*args)
                 return {"status": "success", "message": result}
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to resolve files in changelist '{changelist}': {e}")

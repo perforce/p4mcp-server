@@ -17,13 +17,16 @@ class ChangelistsHandlers:
             if not params.changelist_id:
                 logger.error("changelist_id is required for get action")
                 raise ValueError("changelist_id required for get action")
-            result = await self.changelist_services.get_changelist(params.changelist_id)
+            result = await self.changelist_services.get_changelist(params.changelist_id, params.max_results)
         elif params.action == "list":
-            result = await self.changelist_services.list_changelists(params.workspace_name, params.status, params.user, params.depot_path, params.max_results)
+            result = await self.changelist_services.list_changelists(params.workspace_name, params.status, params.user, params.depot_path, params.max_results or 100)
         else:
             logger.error(f"Unknown changelist query action: {params.action}")
             raise ValueError(f"Unknown changelist query action: {params.action}")
-        return {"status": result["status"], "action": params.action, "message": result["message"]}
+        response = {"status": result["status"], "action": params.action, "message": result["message"]}
+        if isinstance(result, dict) and result.get("note"):
+            response["note"] = result["note"]
+        return response
 
     @handle_errors
     async def _handle_modify_changelists(self, params):

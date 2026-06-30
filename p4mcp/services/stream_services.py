@@ -39,7 +39,7 @@ import logging
 from typing import List, Dict, Any, Optional
 from P4 import P4Exception
 
-from ..core.connection import P4ConnectionManager
+from ..core.connection import P4ConnectionManager, clamp_to_maxresults
 
 logger = logging.getLogger(__name__)
 
@@ -170,15 +170,19 @@ class StreamServices:
                 logger.error(f"P4Error: Failed to get stream '{stream_name}': {e}")
                 return {"status": "error", "message": str(e)}
 
-    async def get_stream_children(self, stream_name: str) -> List[Dict[str, Any]]:
+    async def get_stream_children(self, stream_name: str, limit: Optional[int] = None) -> List[Dict[str, Any]]:
         """Get child streams of a given stream
-        
+
         Args:
             stream_name: Parent stream name (e.g., '//depot/main')
-        
+            limit: Optional upper bound on returned child streams. When set,
+                'p4 streams -m N -F "Parent=..."' is issued. Must be >= 1.
+
         Returns:
             Dict with status and list of child streams
         """
+        if limit is not None and limit < 1:
+            raise ValueError("limit must be a positive integer (>= 1)")
         async with self.connection_manager.get_connection() as p4:
             try:
                 # Verify stream exists
@@ -188,10 +192,19 @@ class StreamServices:
                     if not all_streams:
                         return {"status": "error", "message": f"Stream '{stream_name}' does not exist"}
 
-                children = p4.run("streams", "-F", f"Parent={stream_name}")
+                args = ["streams"]
+                note = None
+                if limit is not None:
+                    effective, note = clamp_to_maxresults(p4, limit)
+                    args.append(f"-m{effective}")
+                args.extend(["-F", f"Parent={stream_name}"])
+                children = p4.run(*args)
                 if not children:
                     return {"status": "success", "message": "No child streams found"}
-                return {"status": "success", "message": [{k: v for k, v in child.items()} for child in children]}
+                response = {"status": "success", "message": [{k: v for k, v in child.items()} for child in children]}
+                if note:
+                    response["note"] = note
+                return response
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to get children of stream '{stream_name}': {e}")
                 return {"status": "error", "message": str(e)}
@@ -584,7 +597,9 @@ class StreamServices:
                 if pv_result:
                     response["parent_view_result"] = pv_result
                 if has_bound_workspaces:
-                    response["warning"] = f"{len(bound_workspaces)} workspace(s) are bound to this stream and may be affected by this change."
+                    response.setdefault("warnings", []).append(
+                        f"{len(bound_workspaces)} workspace(s) are bound to this stream and may be affected by this change."
+                    )
                     response["bound_workspaces"] = [ws.get("client", ws.get("Client", "")) for ws in bound_workspaces]
                 return response
             except P4Exception as e:
@@ -703,15 +718,16 @@ class StreamServices:
                 # It does not take a stream name argument.
                 args = ["resolve", "-So", resolve_flags[resolve_mode]]
                 result = p4.run(*args)
-                return {"status": "success", "message": result}
-            except P4Exception as e:
-                error_str = str(e)
-                # "not opened" means no spec is open for resolve — treat as success
-                if "not opened" in error_str.lower():
+                # Under exception_level=1 a "not opened" outcome (no spec open to
+                # resolve) no longer raises; it simply returns no rows.
+                if not result:
                     return {
                         "status": "success",
                         "message": f"Stream '{stream_name}' has no open spec to resolve"
                     }
+                return {"status": "success", "message": result}
+            except P4Exception as e:
+                error_str = str(e)
                 logger.error(f"P4Error: Failed to resolve stream spec '{stream_name}': {e}")
                 return {"status": "error", "message": error_str}
 
@@ -757,7 +773,7 @@ class StreamServices:
         """
         async with self.connection_manager.get_connection() as p4:
             try:
-                result = p4.run("shelve", "-As", "-c", changelist)
+                result = p4.run_shelve("-As", "-c", changelist)
                 return {"status": "success", "message": result}
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to shelve stream spec in changelist '{changelist}': {e}")
@@ -1562,7 +1578,7 @@ class StreamServices:
                     "result": result
                 }
                 if sync_note:
-                    response["warning"] = sync_note
+                    response.setdefault("warnings", []).append(sync_note)
                 return response
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to switch workspace to stream '{stream_name}': {e}")
@@ -1799,14 +1815,6 @@ class StreamServices:
                     }
             except P4Exception as e:
                 error_str = str(e)
-                # "No stream spec to resolve" or "not opened" means no conflicts
-                if "no stream" in error_str.lower() or "nothing to resolve" in error_str.lower() or "no file" in error_str.lower() or "not opened" in error_str.lower():
-                    return {
-                        "status": "success",
-                        "resolve_needed": False,
-                        "stream": stream_name,
-                        "message": f"Stream '{stream_name}' has no pending spec conflicts"
-                    }
                 logger.error(f"P4Error: Failed to check resolve status for stream '{stream_name}': {e}")
                 return {"status": "error", "message": error_str}
 

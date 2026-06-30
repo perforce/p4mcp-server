@@ -193,6 +193,16 @@ class QueryStreamsParams(PaginatedParams):
         description="Maximum changelists for interchanges",
         examples=[10, 50],
     )
+    max_results: Optional[int] = Field(
+        default=None,
+        ge=1,
+        le=1000,
+        description=(
+            "Maximum number of results to return (max 1000). When set, bounds "
+            "'list' and 'list_workspaces' and also caps 'children' via "
+            "'p4 streams -m N'. Omit for unbounded results."
+        ),
+    )
 
     # --- validators ---
     @field_validator("stream_name")

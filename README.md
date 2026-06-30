@@ -57,7 +57,7 @@
 | Component | Supported Versions |
 |-----------|-------------------|
 | **Operating Systems** | Windows 10+<br>macOS 12+<br>Linux (glibc 2.34+, e.g. Ubuntu 22.04+, Rocky Linux 9+) |
-| **Perforce P4 Server** | 2025.2 *(earlier versions untested)* |
+| **Perforce P4 Server** | 2026.1 *(earlier versions untested)* |
 | **Python** | 3.11+ *(required only for building from source)* |
 
 ## Local P4 MCP Server Installation
@@ -575,6 +575,10 @@ See the [Windsurf MCP documentation](https://docs.windsurf.com/windsurf/cascade/
 - `P4USER` - Your P4 username
 - `P4CLIENT` - Your current P4 workspace. Optional, but recommended
 
+### Result limit environment variables
+- `P4MCP_MAX_RESULTS` - Cap on the number of rows the P4 server returns per command (`p4.maxresults`). Default: `10000`. Set to `0` to disable the limit (server default in effect). When a command would exceed this limit the server aborts it with an error rather than truncating results, so keep the value generous. Can be overridden by the `--max-results` CLI argument. Must be a non-negative integer; an invalid value fails fast at startup before any P4 connection is attempted.
+- `P4MCP_MAX_SCAN_ROWS` - Cap on the number of rows the P4 server scans per command (`p4.maxscanrows`). Unset by default, so admin/group policy governs scan limits. Can be overridden by the `--max-scan-rows` CLI argument. Must be a non-negative integer when supplied.
+
 ### Logging environment variables
 - `P4MCP_LOG_DIR` - Directory for log files. Default: `logs/` in the server executable's directory. Can be overridden by the `--log-dir` CLI argument.
 
@@ -584,6 +588,10 @@ See the [Windsurf MCP documentation](https://docs.windsurf.com/windsurf/cascade/
   - `certifi`: disable `truststore` injection and use default Python TLS certificate behavior. Custom CA bundles (`P4MCP_CA_BUNDLE` / `--ca-bundle`) take effect only in this mode.
 - `P4MCP_SSL_VERIFY` - Set to `false` to disable SSL verification for P4 Code Review API requests. Default: `true`. Works in both TLS modes.
 - `P4MCP_CA_BUNDLE` - Path to a custom CA certificate bundle (PEM) for P4 Code Review API requests. Takes priority over `P4MCP_SSL_VERIFY`. **Requires `P4MCP_TLS_CA_MODE=certifi`** to take effect.
+
+### Telemetry environment variables
+- `OTEL_EXPORTER_OTLP_ENDPOINT` - OTLP collector endpoint for telemetry export. Default: `https://grpc.public.prd.shared.perforce.com`.
+- `OTEL_EXPORTER_OTLP_PROTOCOL` - OTLP export protocol. Only `grpc` is supported; other values fall back to `grpc` with a warning.
 
 ### Supported arguments
 
@@ -607,6 +615,20 @@ See the [Windsurf MCP documentation](https://docs.windsurf.com/windsurf/cascade/
   - If omitted, the full tool catalog is sent to the client (default, backward-compatible).
   - When enabled, `query_server` is always directly visible to the client.
   - **Security:** Admin permission checks (`CheckPermissionMiddleware`) and `--readonly` filtering remain fully enforced. Search transforms query the real tool catalog internally, so tools blocked by middleware or excluded by read-only mode are never discoverable or callable through the search interface.
+
+- `--max-results <N>` - Cap on the number of rows the P4 server returns per command (`p4.maxresults`).
+  - Default: `10000`. Set to `0` to disable the limit (server default in effect).
+  - Protects against runaway AI-driven queries exhausting local memory or overwhelming the server.
+  - When a command would exceed this limit the server aborts it with an error — it does not truncate — so keep the value generous.
+  - Must be a non-negative integer; an invalid value fails fast at startup before any P4 connection is attempted.
+
+  > **Priority order:** `--max-results` > `P4MCP_MAX_RESULTS` > default (`10000`).
+
+- `--max-scan-rows <N>` - Cap on the number of rows the P4 server scans per command (`p4.maxscanrows`).
+  - Unset by default, so admin/group policy governs scan limits.
+  - Must be a non-negative integer when supplied; an invalid value fails fast at startup.
+
+  > **Priority order:** `--max-scan-rows` > `P4MCP_MAX_SCAN_ROWS` > default (unset).
 
 - `--ssl-no-verify` - Disable SSL certificate verification for P4 Code Review API requests.
   - Useful for environments with self-signed or internal CA certificates.
@@ -653,6 +675,15 @@ export P4PORT="ssl:perforce.example.com:1666"
 export P4USER="your_username"
 export P4CLIENT="your_workspace"
 ```
+
+> **`P4USER` must be a standard user.** P4 MCP Server runs commands such as `p4 describe` and `p4 changes` that a `service`-type user is not permitted to run, so a service user will cause tools to fail at runtime. Configure `P4USER` with a Perforce user of type `standard`. See [`p4 user`](https://help.perforce.com/helix-core/server-apps/cmdref/current/Content/CmdRef/p4_user.html) in the P4 CLI documentation.
+
+#### Connection-limit options
+
+These options bound how much work a single P4 command can do, protecting the server against runaway queries:
+
+- `max_results` — Caps how many rows the P4 server returns per command. On by default with a generous value to protect against runaway queries. Lower the value to tighten the bound. Configured via `P4MCP_MAX_RESULTS` or `--max-results`.
+- `max_scan_rows` — Caps how many rows the server scans per command. Unset by default (governed by admin/group policy). Configured via `P4MCP_MAX_SCAN_ROWS` or `--max-scan-rows`.
 
 
 ### Admin configuration
@@ -1191,6 +1222,10 @@ The MCP server checks properties in this order. Each property is resolved indepe
 </details>
 
 <br>
+
+> **Warnings in tool responses**
+>
+> When a P4 command produces a benign informational or warning message (for example, `file(s) up-to-date` or `file not on client`), the tool returns a success `status` and includes the message text in an optional top-level `warnings` list. The field appears only when there is at least one warning. Genuine failures are unaffected and still return an error `status` with the existing `code` and `error` fields.
 
 ## Logging and Usage Data
 

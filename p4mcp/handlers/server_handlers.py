@@ -20,4 +20,4 @@ class ServerHandlers:
         else:
             logger.error(f"Unknown server query action: {params.action}")
             raise ValueError(f"Unknown server query action: {params.action}")
-        return {"status": "success", "action": params.action, "data": result}
+        return {"status": result["status"], "action": params.action, "data": result}

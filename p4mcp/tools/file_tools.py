@@ -38,10 +38,14 @@ def register(server: "P4MCPServer") -> None:
             default=True,
             description="Use p4 diff2 for depot-to-depot diff, false for mixed diff",
         )] = True,
-        max_results: Annotated[int, Field(
-            default=100, ge=1, le=1000,
-            description="Maximum number of results to return",
-        )] = 100,
+        max_results: Annotated[Optional[int], Field(
+            default=None, ge=1, le=1000,
+            description=(
+                "Maximum number of results to return. Bounds history/search/grep "
+                "and also caps fstat info/metadata via 'p4 fstat -m N'. "
+                "Omit for unbounded info/metadata results."
+            ),
+        )] = None,
         pattern: Annotated[Optional[str], Field(
             default=None,
             description="Search or grep pattern - required for search and grep actions",

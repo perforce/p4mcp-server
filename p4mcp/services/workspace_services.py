@@ -100,25 +100,13 @@ class WorkspaceServices:
                 # Opened files
                 opened_files = p4.run_opened()
 
-                # Out-of-sync files
-                try:
-                    out_of_sync = p4.run_sync('-n')
-                except P4Exception as e:
-                    if "File(s) up-to-date" in str(e):
-                        out_of_sync = []
-                    else:
-                        logger.error(f"P4Error: Failed to check out-of-sync files: {e}")
-                        return {"status": "error", "message": str(e)}
-
-                # Pending resolves
-                try:
-                    pending_resolves = p4.run_resolve('-n')
-                except P4Exception as e:
-                    if "No file(s) to resolve" in str(e):
-                        pending_resolves = []
-                    else:
-                        logger.error(f"P4Error: Failed to check pending resolves: {e}")
-                        return {"status": "error", "message": str(e)}
+                # Out-of-sync files and pending resolves. Under
+                # exception_level=1 the benign "file(s) up-to-date" and
+                # "no file(s) to resolve" outcomes no longer raise (they simply
+                # return no rows); genuine failures still raise and propagate to
+                # the outer except branch below.
+                out_of_sync = p4.run_sync('-n')
+                pending_resolves = p4.run_resolve('-n')
 
                 # Last synced changelist
                 synced_changes = p4.run_changes('-m1', '#have')
@@ -146,13 +134,13 @@ class WorkspaceServices:
                 if path or len(path) > 0:
                     args.append(path)
                 result = p4.run(*args)  # Sync all files in the workspace
+                # Under exception_level=1 a benign "file(s) up-to-date" outcome
+                # no longer raises; it is surfaced via the additive top-level
+                # `warnings` field instead of being reported as an error here.
                 return {"status": "success", "message": result}
             except P4Exception as e:
-                if "File(s) up-to-date" in str(e):
-                    return {"status": "success", "message": "Workspace is already up-to-date"}
-                else:
-                    logger.error(f"P4Error: Failed to sync workspace: {e}")
-                    return {"status": "error", "message": str(e)}
+                logger.error(f"P4Error: Failed to sync workspace: {e}")
+                return {"status": "error", "message": str(e)}
 
 
     async def create_workspace(self, workspace_spec: Dict[str, Any]) -> Dict[str, Any]:

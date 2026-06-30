@@ -3,11 +3,11 @@ import logging
 
 from fastmcp import FastMCP, Context
 from .core.config import Config
-from .logging.session_logging import log_tool_call
 from .core.connection import P4ConnectionManager
 
 from .handlers.handlers import Handlers
 from .middleware.check_permission import CheckPermissionMiddleware
+from .middleware.telemetry_middleware import TelemetryMiddleware
 from .tools import ALL_REGISTRARS
 
 logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class P4MCPServer:
     """Perforce MCP Server with improved structure"""
 
-    def __init__(self, session_id: str = None, readonly: bool = True, toolsets: list = [], search_transform: str = None, ssl_verify=None, log_dir: str = None):
+    def __init__(self, session_id: str = None, readonly: bool = True, toolsets: list = [], search_transform: str = None, ssl_verify=None, log_dir: str = None, max_results=None, max_scan_rows=None):
         self.readonly = readonly
         self.toolsets = toolsets
         self.session_id = session_id
@@ -23,6 +23,20 @@ class P4MCPServer:
 
         # Load P4 config (logging is already configured in main.py)
         self.p4config = Config.load()
+
+        # CLI args take priority over config/env for the result limits. Only
+        # override when a CLI value is supplied; reuse the config validator so a
+        # non-integer/negative CLI value fails fast with a clear message before
+        # any P4 connection is attempted.
+        if max_results is not None:
+            self.p4config.max_results = Config._parse_positive_int(
+                "--max-results", max_results, default=None
+            )
+        if max_scan_rows is not None:
+            self.p4config.max_scan_rows = Config._parse_positive_int(
+                "--max-scan-rows", max_scan_rows, default=None
+            )
+
         self.p4_manager = P4ConnectionManager(self.p4config)
 
         # CLI args take priority over config/env for SSL verify
@@ -36,7 +50,15 @@ class P4MCPServer:
     
         logger.info(f"Enabled toolsets: {', '.join(self.toolsets) if self.toolsets else 'None'}")
 
-        self.mcp = FastMCP("P4 MCP Server", middleware=[CheckPermissionMiddleware(self.p4_manager)])
+        # Telemetry middleware is registered outermost (ahead of the permission
+        # check) and only when telemetry consent is on (a session is active), so
+        # nothing is exported when consent is off.
+        middleware = []
+        if self.session_id:
+            middleware.append(TelemetryMiddleware())
+        middleware.append(CheckPermissionMiddleware(self.p4_manager))
+
+        self.mcp = FastMCP("P4 MCP Server", middleware=middleware)
         self._initialize_dependencies()
         self._apply_search_transforms()
     
@@ -91,7 +113,11 @@ class P4MCPServer:
         self.handlers = Handlers(**all_services)
 
     def process_tool_logs(self, tool_name: str, result: dict, ctx: Context) -> dict:
-        """Process incoming data and route to appropriate handler"""
+        """Emit an application-log line for a tool call.
+
+        Telemetry is now carried by OpenTelemetry spans (see
+        ``TelemetryMiddleware``); this retains only the local app-log line.
+        """
         response = {}
         response['mcp_client'] = ctx.session.client_params.clientInfo.name if ctx and ctx.session and ctx.session.client_params else "Unknown"
         response['toolset'] = tool_name.split('_')[1] if '_' in tool_name else "unknown"
@@ -101,9 +127,6 @@ class P4MCPServer:
         response['p4_version'] = getattr(self.p4config, 'p4version', 'Unknown')
 
         logger.info('tool_call: %s', json.dumps(response))
-
-        if self.session_id:
-            log_tool_call(response, session_id=self.session_id)
 
     def _register_tools(self):
         """Register all tools by delegating to per-toolset modules."""

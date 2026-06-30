@@ -95,7 +95,8 @@ class ReviewServices:
         async with self.connection_manager.get_connection() as p4:
             try:
                 prop = p4.run("property", "-l", "-n", "P4.Swarm.URL")
-                swarm_url = prop[0].get('value', None)
+                prop_dicts = [p for p in prop if isinstance(p, dict)]
+                swarm_url = prop_dicts[0].get('value', None) if prop_dicts else None
                 if not swarm_url:
                     raise Exception("Swarm URL not configured on the server.")
                 self.api_base = f"{swarm_url.rstrip('/')}/api/v11"

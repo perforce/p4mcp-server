@@ -29,15 +29,17 @@ if not defined PYTHON_CMD (
 
 set "SCRIPT_DIR=%~dp0"
 
-REM REM Version configuration
+REM Version configuration
+REM pyproject.toml's [project] version is the single source of truth.
+set "VERSION_FILE=%SCRIPT_DIR%p4mcp\_version.py"
 if "%RELEASE_VERSION%"=="" (
-    
-    set CONNECTION_FILE=%SCRIPT_DIR%p4mcp\core\connection.py
-    
-    if exist "!CONNECTION_FILE!" (
+
+    set "PYPROJECT_FILE=%SCRIPT_DIR%pyproject.toml"
+
+    if exist "!PYPROJECT_FILE!" (
         set "VER_RAW="
-        for /f "usebackq tokens=1* delims==" %%A in (`findstr /r /c:"^__version__ *= *" "!CONNECTION_FILE!"`) do (
-            set VER_RAW=%%B
+        for /f "usebackq tokens=1* delims==" %%A in (`findstr /r /c:"^version *= *" "!PYPROJECT_FILE!"`) do (
+            if not defined VER_RAW set VER_RAW=%%B
         )
         if defined VER_RAW (
             set "VER_STR=!VER_RAW: =!"
@@ -45,15 +47,27 @@ if "%RELEASE_VERSION%"=="" (
             set "VER_STR=!VER_STR:"=!"
             for /f "tokens=1 delims=#;" %%V in ("!VER_STR!") do set "RELEASE_VERSION=%%V"
         ) else (
-            call :log_warning "Could not parse __version__ from connection.py"
+            call :log_warning "Could not parse version from pyproject.toml"
         )
     ) else (
-        call :log_warning "Version file not found: !CONNECTION_FILE!"
+        call :log_warning "Version file not found: !PYPROJECT_FILE!"
     )
 )
 
-if "%RELEASE_VERSION%"=="" set RELEASE_VERSION=2025.1.0
+REM Fail loudly rather than baking a stale default: a malformed pyproject.toml
+REM or a missing version key must stop the build, not produce a wrong-version
+REM binary. Set RELEASE_VERSION in the environment to override the source.
+if "%RELEASE_VERSION%"=="" (
+    call :log_error "Could not determine version from pyproject.toml"
+    exit /b 1
+)
 set VERSION=%RELEASE_VERSION%
+
+REM Version baked into the frozen binary. Defaults to RELEASE_VERSION, but CI
+REM (buildtools\buildscripts\compile.bat) overrides it with a build-number-qualified
+REM value while keeping RELEASE_VERSION for archive naming and p4python matching.
+if not defined BAKE_VERSION set BAKE_VERSION=%RELEASE_VERSION%
+
 set ARCHIVE_NAME=p4-mcp-server-%VERSION%.zip
 set VENV_DIR=%SCRIPT_DIR%.venv
 set EXECUTABLE_PATH=%SCRIPT_DIR%dist\p4-mcp-server\p4-mcp-server.exe
@@ -287,20 +301,42 @@ if exist "p4mcp\telemetry\P4MCP.exe" (
     exit /b 1
 )
 
+REM Bake the version into _version.py so the frozen binary reports the right
+REM version (importlib.metadata can't read package metadata inside a PyInstaller
+REM bundle). Batch has no trap, so :restore_version is invoked explicitly before
+REM every exit path below (success and failure). The baked file mirrors the
+REM build.sh structure: triple-quoted docstring followed by the assignment.
+if exist "%VERSION_FILE%" (
+    REM A leftover .bak from a previously interrupted run means _version.py is
+    REM already baked; restore it first so the new backup is the canonical form.
+    if exist "%VERSION_FILE%.bak" move /y "%VERSION_FILE%.bak" "%VERSION_FILE%" >nul
+    call :log_info "Baking version %BAKE_VERSION% into %VERSION_FILE% for the frozen build..."
+    copy /y "%VERSION_FILE%" "%VERSION_FILE%.bak" >nul
+    > "%VERSION_FILE%" echo """Single source of truth for the package version.
+    >> "%VERSION_FILE%" echo.
+    >> "%VERSION_FILE%" echo This file was rewritten by build.bat to bake the static version into the frozen
+    >> "%VERSION_FILE%" echo PyInstaller binary. build.bat restores the importlib.metadata form once done.
+    >> "%VERSION_FILE%" echo """
+    >> "%VERSION_FILE%" echo __version__ = "%BAKE_VERSION%"
+)
+
 REM Run PyInstaller for main app
 call :log_info "Running PyInstaller for main app..."
 "%VENV_DIR%\Scripts\python.exe" -m PyInstaller p4-mcp-server.spec
 if errorlevel 1 (
+    call :restore_version
     call :log_error "PyInstaller build failed"
     exit /b 1
 )
+
+call :restore_version
 
 call :log_info "PyInstaller build completed. Checking for executable..."
 
 REM Check if build was successful
 if exist "%EXECUTABLE_PATH%" (
     call :log_success "Build successful!"
-    
+
     REM Only show this message if not packaging
     if /i not "%COMMAND%"=="package" (
         call :log_info "Executable created at: %EXECUTABLE_PATH%"
@@ -312,6 +348,13 @@ if exist "%EXECUTABLE_PATH%" (
 ) else (
     call :log_error "Build failed!"
     exit /b 1
+)
+goto :eof
+
+:restore_version
+REM Restore _version.py to its importlib.metadata form from the backup.
+if exist "%VERSION_FILE%.bak" (
+    move /y "%VERSION_FILE%.bak" "%VERSION_FILE%" >nul
 )
 goto :eof
 

@@ -22,7 +22,7 @@ class StreamHandlers:
                 stream_path=getattr(params, "stream_path", None),
                 filter=getattr(params, "filter", None),
                 fields=getattr(params, "fields", None),
-                limit=getattr(params, "max_results", 50),
+                limit=getattr(params, "max_results", None) or 50,
                 unloaded=getattr(params, "unloaded", False),
                 all_streams=getattr(params, "all_streams", False),
                 viewmatch=getattr(params, "viewmatch", None),
@@ -36,7 +36,10 @@ class StreamHandlers:
             )
 
         elif action == "children":
-            result = await self.stream_services.get_stream_children(params.stream_name)
+            result = await self.stream_services.get_stream_children(
+                params.stream_name,
+                limit=getattr(params, "max_results", None),
+            )
 
         elif action == "parent":
             result = await self.stream_services.get_stream_parent(params.stream_name)
@@ -62,7 +65,7 @@ class StreamHandlers:
             result = await self.stream_services.list_stream_workspaces(
                 stream_name=getattr(params, "stream_name", None),
                 user=getattr(params, "user", None),
-                limit=getattr(params, "max_results", 50),
+                limit=getattr(params, "max_results", None) or 50,
                 unloaded=getattr(params, "unloaded", False),
             )
 
@@ -96,11 +99,14 @@ class StreamHandlers:
             logger.error(f"Unknown stream query action: {action}")
             raise ValueError(f"Unknown stream query action: {action}")
 
-        return {
+        response = {
             "status": result.get("status", "success") if isinstance(result, dict) else "success",
             "action": action,
             "data": result,
         }
+        if isinstance(result, dict) and result.get("note"):
+            response["note"] = result["note"]
+        return response
 
     # -----------------------------------------------------------------
     # MODIFY

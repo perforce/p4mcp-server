@@ -23,7 +23,6 @@ class ServerServices:
         async with self.connection_manager.get_connection() as p4:
             try:
                 server_info = p4.run("info")
-                print(server_info[0])
                 return {"status": "success", "message": {k: v for k, v in server_info[0].items() if isinstance(v, str)}}
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to get server info: {e}")
@@ -35,7 +34,7 @@ class ServerServices:
             try:
                 user_info = p4.run("user", "-o")
                 if not user_info:
-                    raise ValueError("Current user not found")
+                    return {"status": "not_found", "message": "Current user not found"}
                 return {"status": "success", "message": {k: v for k, v in user_info[0].items() if isinstance(v, str)}}
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to get current user: {e}")

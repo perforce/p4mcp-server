@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 
 set -e
+
+# This script must be executed, not sourced: it relies on an EXIT trap to
+# restore p4mcp/_version.py, and EXIT traps do not fire in a sourcing shell.
+if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+    echo "❌ build.sh must be executed, not sourced." >&2
+    return 1
+fi
+
 command="${1:-build}"
 
 # Script configuration
@@ -10,29 +18,34 @@ EXECUTABLE_PATH="$SCRIPT_DIR/dist/p4-mcp-server/p4-mcp-server"
 PYTHON_CMD="python3"
 
 # --- Version configuration ---
+# pyproject.toml's [project] version is the single source of truth.
+VERSION_FILE="$SCRIPT_DIR/p4mcp/_version.py"
 if [ -z "$RELEASE_VERSION" ]; then
-    CONNECTION_FILE="$SCRIPT_DIR/p4mcp/core/connection.py"
+    PYPROJECT_FILE="$SCRIPT_DIR/pyproject.toml"
 
-    if [ -f "$CONNECTION_FILE" ]; then
-        VER_RAW=$(grep -E '^__version__ *= *' "$CONNECTION_FILE" | cut -d '=' -f2- | xargs)
+    if [ ! -f "$PYPROJECT_FILE" ]; then
+        echo "❌ Version file not found: $PYPROJECT_FILE" >&2
+        exit 1
+    fi
 
-        if [ -n "$VER_RAW" ]; then
-            # Remove quotes and extra spaces
-            VER_STR=$(echo "$VER_RAW" | tr -d " '\"")
+    # Take the first `version = "x.y.z"` line (the [project] version) and
+    # strip the key, quotes and surrounding whitespace.
+    RELEASE_VERSION=$(grep -E '^version *= *' "$PYPROJECT_FILE" | head -n1 \
+        | cut -d '=' -f2- | tr -d " '\"" | cut -d'#' -f1)
 
-            # Take the first token before any # or ;
-            RELEASE_VERSION=$(echo "$VER_STR" | cut -d'#' -f1 | cut -d';' -f1 | xargs)
-        else
-            echo "⚠️  Could not parse __version__ from connection.py" >&2
-        fi
-    else
-        echo "⚠️  Version file not found: $CONNECTION_FILE" >&2
+    # Fail loudly rather than baking a stale default: a malformed pyproject.toml
+    # or a missing version key must stop the build, not produce a wrong-version
+    # binary. Set RELEASE_VERSION in the environment to override the source.
+    if [ -z "$RELEASE_VERSION" ]; then
+        echo "❌ Could not parse version from pyproject.toml" >&2
+        exit 1
     fi
 fi
 
-if [ -z "$RELEASE_VERSION" ]; then
-    RELEASE_VERSION="2025.1.0"
-fi
+# Version baked into the frozen binary. Defaults to RELEASE_VERSION, but CI
+# (buildtools/buildscripts/compile.sh) overrides it with a build-number-qualified
+# value while keeping RELEASE_VERSION for archive naming and p4python matching.
+BAKE_VERSION="${BAKE_VERSION:-$RELEASE_VERSION}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -161,6 +174,32 @@ build_executable() {
     else
         log_error "Failed to build consent_ui binary"
         exit 1
+    fi
+
+    # Bake the version into _version.py so the frozen binary reports the right
+    # version (importlib.metadata can't see package metadata inside a PyInstaller
+    # bundle). Restore the importlib.metadata form on EXIT — success or failure —
+    # via a trap.
+    if [ -f "$VERSION_FILE" ]; then
+        # A leftover .bak from a previously interrupted run means _version.py is
+        # already baked; restore it first so we back up the canonical form, not
+        # a stale baked one.
+        if [ -f "$VERSION_FILE.bak" ]; then
+            mv -f "$VERSION_FILE.bak" "$VERSION_FILE"
+        fi
+        log_info "Baking version $BAKE_VERSION into $VERSION_FILE for the frozen build..."
+        cp "$VERSION_FILE" "$VERSION_FILE.bak"
+        trap 'if [ -f "$VERSION_FILE.bak" ]; then mv -f "$VERSION_FILE.bak" "$VERSION_FILE"; fi' EXIT
+        chmod u+w "$VERSION_FILE"
+        cat > "$VERSION_FILE" <<EOF
+"""Single source of truth for the package version.
+
+This file was rewritten by build.sh to bake the static version into the frozen
+PyInstaller binary. build.sh restores the importlib.metadata form (a try/except
+around importlib.metadata.version) once the build completes.
+"""
+__version__ = "$BAKE_VERSION"
+EOF
     fi
 
     # Run PyInstaller for main app

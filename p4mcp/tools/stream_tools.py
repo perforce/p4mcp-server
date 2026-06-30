@@ -122,12 +122,16 @@ def register(server: "P4MCPServer") -> None:
             description="Max changelists (interchanges)",
             examples=[10, 50],
         )] = None,
-        max_results: Annotated[int, Field(
-            default=50,
+        max_results: Annotated[Optional[int], Field(
+            default=None,
             ge=1,
             le=1000,
-            description="Maximum number of results to return",
-        )] = 50,
+            description=(
+                "Maximum number of results to return. Bounds 'list' and "
+                "'list_workspaces' and also caps 'children' via 'p4 streams -m N'. "
+                "Omit for unbounded results."
+            ),
+        )] = None,
     ) -> dict:
         """Query streams: list, get spec, children/parent/graph, integration status, workspaces, validate files, check resolve, interchanges (READ permission)"""
         params = stream_m.QueryStreamsParams(

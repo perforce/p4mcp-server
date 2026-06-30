@@ -16,23 +16,26 @@ class FilesHandlers:
         if params.action == "content":
             result = await self.file_services.get_file_content(params.file_path)
         elif params.action == "history":
-            result = await self.file_services.get_file_history(params.file_path, params.max_results)
+            result = await self.file_services.get_file_history(params.file_path, params.max_results or 100)
         elif params.action == "info":
-            result = await self.file_services.get_file_info(params.file_path)
+            result = await self.file_services.get_file_info(params.file_path, params.max_results)
         elif params.action == "metadata":
-            result = await self.file_services.get_file_metadata(params.file_path)
+            result = await self.file_services.get_file_metadata(params.file_path, params.max_results)
         elif params.action == "diff":
             result = await self.file_services.diff_files(params.file_path, params.file2, params.diff2)
         elif params.action == "annotations":
             result = await self.file_services.get_file_annotations(params.file_path)
         elif params.action == "search":
-            result = await self.file_services.search_files(params.file_path, params.pattern, params.max_results)
+            result = await self.file_services.search_files(params.file_path, params.pattern, params.max_results or 100)
         elif params.action == "grep":
-            result = await self.file_services.grep_files(params.file_path, params.pattern, params.case_insensitive, params.max_results)
+            result = await self.file_services.grep_files(params.file_path, params.pattern, params.case_insensitive, params.max_results or 100)
         else:
             logger.error(f"Unknown file query action: {params.action}")
             raise ValueError(f"Unknown file query action: {params.action}")
-        return {"status": result["status"], "action": params.action, "data": result}
+        response = {"status": result["status"], "action": params.action, "data": result}
+        if isinstance(result, dict) and result.get("note"):
+            response["note"] = result["note"]
+        return response
 
     @handle_errors
     async def _handle_modify_files(self, params):

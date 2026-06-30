@@ -17,7 +17,7 @@ import logging
 from typing import List, Dict, Any, Optional
 from P4 import P4Exception
 
-from ..core.connection import P4ConnectionManager
+from ..core.connection import P4ConnectionManager, clamp_to_maxresults
 
 logger = logging.getLogger(__name__)
 
@@ -27,16 +27,34 @@ class ChangelistServices:
     def __init__(self, connection_manager: P4ConnectionManager):
         self.connection_manager = connection_manager
 
-    async def get_changelist(self, changelist_id: str) -> Dict[str, Any]:
-        """Get details of a specific changelist"""
+    async def get_changelist(self, changelist_id: str, max_results: Optional[int] = None) -> Dict[str, Any]:
+        """Get details of a specific changelist
+
+        Args:
+            changelist_id: Changelist number, or 'default' for the default changelist.
+            max_results: Optional upper bound on open-file entries for the default
+                changelist. When set, 'p4 opened -m N -c default' is issued.
+                Must be >= 1. Ignored for numbered changelists.
+        """
+        if max_results is not None and max_results < 1:
+            raise ValueError("max_results must be a positive integer")
         async with self.connection_manager.get_connection() as p4:
             try:
                 if changelist_id and changelist_id == "default":
-                    opened_files = p4.run("opened", "-c", "default")
-                    return {"status": "success", "message": {"opened_files": opened_files}}
+                    args = ["opened"]
+                    note = None
+                    if max_results is not None:
+                        effective, note = clamp_to_maxresults(p4, max_results)
+                        args.extend(["-m", str(effective)])
+                    args.extend(["-c", "default"])
+                    opened_files = p4.run(*args)
+                    response = {"status": "success", "message": {"opened_files": opened_files}}
+                    if note:
+                        response["note"] = note
+                    return response
                 changelist = p4.run("describe", changelist_id)
                 if not changelist:
-                    raise ValueError(f"Changelist '{changelist_id}' not found")
+                    return {"status": "not_found", "message": f"Changelist '{changelist_id}' not found"}
                 return {"status": "success", "message": {k: v for k, v in changelist[0].items()}}
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to get changelist '{changelist_id}': {e}")

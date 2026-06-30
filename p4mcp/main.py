@@ -1,4 +1,5 @@
 import sys
+import os
 import logging
 import argparse
 import signal
@@ -7,7 +8,7 @@ from typing import Optional
 from p4mcp.telemetry.consent import consent_config_exist
 from p4mcp.logging.global_logging import setup_logging
 from p4mcp.logging.session_logging import start_session, end_session
-from p4mcp.core.connection import __version__
+from p4mcp._version import __version__
 from p4mcp.core.ssl_config import configure_tls_ca_mode, resolve_ssl_verify
 
 project_root = Path(__file__).parent.parent
@@ -47,6 +48,13 @@ def parse_args() -> argparse.Namespace:
         help="Allow usage data collection (default: False)"
     )
     parser.add_argument(
+        "--otel-console",
+        action="store_true",
+        default=False,
+        help="Also export OpenTelemetry spans to the console (requires --allow-usage). "
+             "Spans are exported to the console automatically when LOG_LEVEL=DEBUG."
+    )
+    parser.add_argument(
         "--ssl-no-verify",
         action="store_true",
         default=False,
@@ -75,6 +83,20 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=8000,
         help="Port for HTTP transport (default: 8000)"
+    )
+    parser.add_argument(
+        "--max-results",
+        type=int,
+        default=None,
+        help="Cap on rows the P4 server returns per command (p4.maxresults). "
+             "Default: 10000; 0 disables the limit. Overrides P4MCP_MAX_RESULTS."
+    )
+    parser.add_argument(
+        "--max-scan-rows",
+        type=int,
+        default=None,
+        help="Cap on rows the P4 server scans per command (p4.maxscanrows). "
+             "Unset by default. Overrides P4MCP_MAX_SCAN_ROWS."
     )
     parser.add_argument(
         "--search-transform",
@@ -121,8 +143,11 @@ def main() -> None:
     # Resolve log directory with proper priority: CLI > env > default
     log_dir = resolve_log_dir(args, config)
 
-    # Setup logging once with the correct log directory
-    setup_logging("INFO", log_dir=log_dir)
+    # Setup logging once with the correct log directory. LOG_LEVEL drives both
+    # the log threshold and the OTel console-export gating, so honour it here
+    # (default INFO) instead of hardcoding the level.
+    log_level = os.environ.get("LOG_LEVEL", "INFO")
+    setup_logging(log_level, log_dir=log_dir)
 
     # Now that logging is configured, log startup messages
     configure_tls_ca_mode()
@@ -135,10 +160,13 @@ def main() -> None:
     server = None
     session_id = None
     try:
-        if args.allow_usage==True:
+        if args.allow_usage:
             if consent_config_exist():
                 logger.info("Telemetry consent config exists.")
-                session_id = start_session()
+                session_id = start_session(
+                    otel_console=args.otel_console,
+                    ca_bundle=args.ca_bundle,
+                )
         # Determine SSL verify: --ca-bundle > --ssl-no-verify > env vars > default (True)
         ssl_verify = resolve_ssl_verify(args)
         server = P4MCPServer(
@@ -148,6 +176,8 @@ def main() -> None:
             search_transform=args.search_transform,
             ssl_verify=ssl_verify,
             log_dir=log_dir,
+            max_results=args.max_results,
+            max_scan_rows=args.max_scan_rows,
         )
         if args.transport == "http":
             logger.info(f"Starting P4 MCP Server with HTTP transport on port {args.port}")
@@ -160,9 +190,9 @@ def main() -> None:
         logger.debug("Traceback:", exc_info=True)
         sys.exit(1)
     finally:
-        if args is not None and args.allow_usage==True and session_id:
+        if args is not None and args.allow_usage and session_id:
             end_session(session_id)
-            logger.info("Uploading session log to server...")
+            logger.info("Telemetry session ended; spans flushed.")
 
 if __name__ == "__main__":
     main()

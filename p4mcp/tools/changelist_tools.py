@@ -49,10 +49,14 @@ def register(server: "P4MCPServer") -> None:
             description="Filter by depot path - for list action",
             examples=["//depot/my_workspace/..."],
         )] = None,
-        max_results: Annotated[int, Field(
-            default=100, ge=1, le=1000,
-            description="Maximum number of results to return",
-        )] = 100,
+        max_results: Annotated[Optional[int], Field(
+            default=None, ge=1, le=1000,
+            description=(
+                "Maximum number of results to return. Bounds the 'list' action "
+                "and also caps open files for get('default') via 'p4 opened -m N'. "
+                "Omit for unbounded results."
+            ),
+        )] = None,
     ) -> dict:
         """Get changelist details and list changelists (READ permission)"""
         params = m.QueryChangelistsParams(

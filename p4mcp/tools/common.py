@@ -31,8 +31,21 @@ async def handle_with_logging(
     tool_name: str,
     ctx: Context,
 ) -> dict:
-    """Run the handler, log the result, and return it."""
+    """Run the handler, log the result, and return it.
+
+    Any benign P4 info/warning messages captured during the operation (e.g.
+    "file(s) up-to-date", "not on client") are drained via
+    ``pop_last_warnings()`` and attached as an additive top-level ``warnings``
+    list when present. This is purely additive: ``status``/``code``/``error``
+    are left untouched, and a clean operation omits the ``warnings`` field
+    entirely.
+    """
+    from ..core.connection import pop_last_warnings
+
     result = await server.handlers.handle(operation, resource, params)
+    warnings = pop_last_warnings()
+    if warnings and isinstance(result, dict) and "warnings" not in result:
+        result["warnings"] = warnings
     process_and_log(server, tool_name, result, ctx)
     return result
 
