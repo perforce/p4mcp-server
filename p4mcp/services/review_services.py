@@ -510,9 +510,8 @@ class ReviewServices:
                     payload["context"]["leftLine"] = context.leftLine
                 if context.rightLine is not None:
                     payload["context"]["rightLine"] = context.rightLine
-                if context.content:
-                    # AI is adding random content so for now we skip adding empty content
-                    payload["context"]["content"] = []
+                if context.content is not None:
+                    payload["context"]["content"] = context.content
                 if context.version is not None:
                     payload["context"]["version"] = context.version
                 if context.attribute:
