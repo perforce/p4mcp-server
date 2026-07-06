@@ -128,7 +128,7 @@ def register(server: "P4MCPServer") -> None:
         action: Annotated[Literal[
             "create", "refresh_projects", "vote", "transition",
             "append_participants", "add_comment", "reply_comment",
-            "append_change", "replace_with_change", "join",
+            "edit_comment", "append_change", "replace_with_change", "join",
             "archive_inactive", "mark_comment_read", "mark_comment_unread",
             "mark_all_comments_read", "mark_all_comments_unread",
             "update_author", "update_description",
@@ -252,12 +252,14 @@ def register(server: "P4MCPServer") -> None:
         )] = None,
         body: Annotated[Optional[str], Field(
             default=None,
-            description="Comment body (required for add_comment, reply_comment)",
+            description="Comment body (required for add_comment, reply_comment; optional for edit_comment)",
             examples=["Looks good."],
         )] = None,
-        task_state: Annotated[Optional[Literal["open", "comment"]], Field(
+        task_state: Annotated[Optional[Literal["open", "comment", "addressed", "verified"]], Field(
             default=None,
-            description="Task state",
+            description="Task state. add_comment accepts only 'open'|'comment'; "
+            "edit_comment additionally accepts 'addressed'|'verified' (open -> verified "
+            "requires an intermediate 'addressed' step; only the comment author can edit)",
         )] = None,
         notify: Annotated[Optional[Literal["immediate", "delayed"]], Field(
             default=None,
@@ -265,7 +267,8 @@ def register(server: "P4MCPServer") -> None:
         )] = None,
         comment_id: Annotated[Optional[int], Field(
             default=None,
-            description="Parent comment ID (reply_comment, mark_comment_read/unread)",
+            description="Comment ID (target of edit_comment, parent for reply_comment, "
+            "mark_comment_read/unread)",
             examples=[987],
         )] = None,
         not_updated_since: Annotated[Optional[str], Field(

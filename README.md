@@ -1140,6 +1140,7 @@ The MCP server checks properties in this order. Each property is resolved indepe
   - `delete_participants` - Remove participants from a review
   - `add_comment` - Add a comment to a review
   - `reply_comment` - Reply to an existing comment
+  - `edit_comment` - Edit a comment's body and/or task state (open/addressed/verified; author only)
   - `append_change` - Add a changelist to an existing review
   - `replace_with_change` - Replace review content with a changelist
   - `join` - Join a review as a participant
