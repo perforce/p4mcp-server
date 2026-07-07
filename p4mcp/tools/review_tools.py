@@ -258,8 +258,9 @@ def register(server: "P4MCPServer") -> None:
         task_state: Annotated[Optional[Literal["open", "comment", "addressed", "verified"]], Field(
             default=None,
             description="Task state. add_comment accepts only 'open'|'comment'; "
-            "edit_comment additionally accepts 'addressed'|'verified' (open -> verified "
-            "requires an intermediate 'addressed' step; only the comment author can edit)",
+            "edit_comment additionally accepts 'addressed'|'verified'. The documented "
+            "flow is open -> addressed -> verified, though Swarm does not necessarily "
+            "enforce the ordering server-side; only the comment author can edit",
         )] = None,
         notify: Annotated[Optional[Literal["immediate", "delayed"]], Field(
             default=None,

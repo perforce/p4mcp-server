@@ -564,9 +564,11 @@ class ReviewServices:
         """POST /api/v11/comments/{id}/edit - Edit a comment body and/or its task state
 
         Only fields provided are updated. Swarm only allows the comment's author
-        to edit it. task_state accepts "comment"|"open"|"addressed"|"verified";
-        some transitions require an intermediate step (open -> verified must go
-        through addressed).
+        to edit it (403 otherwise). task_state accepts
+        "comment"|"open"|"addressed"|"verified". Swarm's docs describe the flow
+        open -> addressed -> verified, but live testing against Swarm (API v11)
+        showed the server does not enforce the ordering; treat it as the
+        recommended convention rather than a hard constraint.
 
         Args:
             comment_id = 1234
