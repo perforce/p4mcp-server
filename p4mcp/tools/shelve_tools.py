@@ -19,7 +19,7 @@ def register(server: "P4MCPServer") -> None:
         return
 
     # ── read ────────────────────────────────────────────────────────────
-    @server.mcp.tool(tags=["read", "shelves"])
+    @server.mcp.tool(tags=["read", "shelves"], annotations={"readOnlyHint": True})
     async def query_shelves(
         action: Annotated[Literal["list", "diff", "files"], Field(
             description="Shelve query action: list returns all shelved changelists, diff shows shelved file differences, files lists files in shelved changelist"
@@ -51,7 +51,7 @@ def register(server: "P4MCPServer") -> None:
     if server.readonly:
         return
 
-    @server.mcp.tool(tags=["write", "shelves"])
+    @server.mcp.tool(tags=["write", "shelves"], annotations={"readOnlyHint": False, "destructiveHint": True})
     async def modify_shelves(
         action: Annotated[Literal["shelve", "unshelve", "update", "delete", "unshelve_to_changelist"], Field(
             description="Shelve modification action: shelve stores files to shelf, unshelve restores files from shelf, update modifies shelved files, delete removes shelf, unshelve_to_changelist restores to specific changelist"

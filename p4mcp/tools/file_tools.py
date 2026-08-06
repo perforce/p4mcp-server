@@ -19,7 +19,7 @@ def register(server: "P4MCPServer") -> None:
         return
 
     # ── read ────────────────────────────────────────────────────────────
-    @server.mcp.tool(tags=["read", "files"])
+    @server.mcp.tool(tags=["read", "files"], annotations={"readOnlyHint": True})
     async def query_files(
         action: Annotated[Literal["content", "history", "info", "metadata", "diff", "annotations", "search", "grep"], Field(
             description="File query action, metadata includes extra information like optional attributes and file size"
@@ -68,7 +68,7 @@ def register(server: "P4MCPServer") -> None:
     if server.readonly:
         return
 
-    @server.mcp.tool(tags=["write", "files"])
+    @server.mcp.tool(tags=["write", "files"], annotations={"readOnlyHint": False, "destructiveHint": True})
     async def modify_files(
         action: Annotated[Literal["add", "edit", "delete", "move", "revert", "reconcile", "resolve", "sync"], Field(
             description="File modification action"
