@@ -177,21 +177,21 @@ class CommentContext(BaseParams):
         examples=["//depot/path/to/file.txt"]
     )
     leftLine: Optional[int] = Field(
-        default="null",
+        default=None,
         ge=1,
         description="leftline optional, but if specified, you must also specify the rightline and " \
         "content parameters. Integer: Left-side diff line number to attach the inline comment to. " \
         "Valid only for changes and reviews topics."
     )
     rightLine: Optional[int] = Field(
-        default="null",
+        default=None,
         ge=1,
         description="rightline optional, but if specified, you must also specify the leftline and " \
         "content parameters. Integer: Right-side diff line number to attach the inline comment to. " \
         "Valid only for changes and reviews topics."
     )
     content: Optional[List[str]] = Field(
-        default="null",
+        default=None,
         description="content optional, but if specified, you must also specify the leftline and rightline " \
         "parameters. Array of strings: Provide the content of the codeline the comment is on and the four " \
         "preceding codelines. Always add a newline character ('\n') to the end of each line in the array. ",
