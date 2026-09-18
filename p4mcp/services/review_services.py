@@ -553,7 +553,48 @@ class ReviewServices:
         except Exception as e:
             logger.error(f"Failed to reply to comment '{comment_id}' in review '{review_id}': {e}")
             return {"status": "error", "message": str(e)}
-        
+
+    async def edit_comment(
+            self,
+            comment_id: int,
+            body: Optional[str] = None,
+            task_state: Optional[str] = None,
+            notify: Optional[str] = None,
+        ) -> Dict[str, Any]:
+        """POST /api/v11/comments/{id}/edit - Edit a comment body and/or its task state
+
+        Only fields provided are updated. Swarm only allows the comment's author
+        to edit it (403 otherwise). task_state accepts
+        "comment"|"open"|"addressed"|"verified". Swarm's docs describe the flow
+        open -> addressed -> verified, but live testing against Swarm (API v11)
+        showed the server does not enforce the ordering; treat it as the
+        recommended convention rather than a hard constraint.
+
+        Args:
+            comment_id = 1234
+            body = "Updated comment text."
+            task_state = "addressed"
+            notify = "delayed"|"immediate"
+        """
+        try:
+            auth = await self._get_auth()
+            api_base = await self._get_api_base()
+            url = f"{api_base}/comments/{comment_id}/edit"
+
+            payload = {}
+            if body is not None:
+                payload["body"] = body
+            if task_state:
+                payload["taskState"] = task_state
+            if notify:
+                payload["notify"] = notify
+
+            r = requests.post(url, auth=auth, json=payload, verify=self.verify_ssl)
+            return {"status": "success", "message": self._handle_response(r)}
+        except Exception as e:
+            logger.error(f"Failed to edit comment '{comment_id}': {e}")
+            return {"status": "error", "message": str(e)}
+
     async def append_change_to_review(
             self, 
             review_id: int, 

@@ -140,6 +140,7 @@ class ReviewModifyAction(str, Enum):
     APPEND_PARTICIPANTS = "append_participants"
     ADD_COMMENT = "add_comment"
     REPLY_COMMENT = "reply_comment"
+    EDIT_COMMENT = "edit_comment"
     APPEND_CHANGE = "append_change"
     REPLACE_WITH_CHANGE = "replace_with_change"
     JOIN = "join"
@@ -162,6 +163,8 @@ class FixStatus(str, Enum):
 class TaskState(str, Enum):
     OPEN = "open"
     COMMENT = "comment"
+    ADDRESSED = "addressed"
+    VERIFIED = "verified"
 
 class NotifyMode(str, Enum):
     IMMEDIATE = "immediate"
@@ -393,7 +396,8 @@ class ModifyReviewsParams(BaseParams):
     )
     task_state: Optional[TaskState] = Field(
         default=None,
-        description="Task state (optional for add_comment)",
+        description="Task state (optional for add_comment: open|comment; "
+        "edit_comment additionally accepts addressed|verified)",
         examples=["open"]
     )
     notify: Optional[NotifyMode] = Field(
@@ -442,7 +446,7 @@ class ModifyReviewsParams(BaseParams):
                 raise ValueError(f"{label or field} is required for action: {a}")
 
         # Actions requiring review_id
-        if a not in [ReviewModifyAction.CREATE, ReviewModifyAction.ARCHIVE_INACTIVE] and a != ReviewModifyAction.CREATE:
+        if a not in [ReviewModifyAction.CREATE, ReviewModifyAction.ARCHIVE_INACTIVE, ReviewModifyAction.EDIT_COMMENT] and a != ReviewModifyAction.CREATE:
             if a not in [ReviewModifyAction.ARCHIVE_INACTIVE] and not self.review_id:
                 raise ValueError(f"review_id is required for action: {a}")
 
@@ -464,6 +468,16 @@ class ModifyReviewsParams(BaseParams):
         elif a == ReviewModifyAction.ADD_COMMENT:
             need("review_id")
             need("body", "body")
+            if self.task_state and self.task_state not in [TaskState.OPEN, TaskState.COMMENT]:
+                raise ValueError(
+                    "task_state must be 'open' or 'comment' for add_comment; "
+                    "'addressed'/'verified' are only reachable via edit_comment"
+                )
+
+        elif a == ReviewModifyAction.EDIT_COMMENT:
+            need("comment_id", "comment_id")
+            if not self.body and not self.task_state:
+                raise ValueError("At least one of body or task_state is required for edit_comment action")
 
         elif a == ReviewModifyAction.REPLY_COMMENT:
             need("review_id")

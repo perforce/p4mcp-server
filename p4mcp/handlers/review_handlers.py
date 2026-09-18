@@ -163,6 +163,15 @@ class ReviewsHandlers:
                 params.body
             )
 
+        elif action == "edit_comment":
+            require("comment_id", "comment_id")
+            result = await self.review_services.edit_comment(
+                params.comment_id,
+                getattr(params, "body", None),
+                getattr(params, "task_state", None),
+                getattr(params, "notify", None)
+            )
+
         elif action == "append_change":
             require("review_id")
             require("change_id", "change_id")
