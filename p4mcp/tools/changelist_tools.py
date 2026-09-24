@@ -19,7 +19,7 @@ def register(server: "P4MCPServer") -> None:
         return
 
     # ── read ────────────────────────────────────────────────────────────
-    @server.mcp.tool(tags=["read", "changelists"])
+    @server.mcp.tool(tags=["read", "changelists"], annotations={"readOnlyHint": True})
     async def query_changelists(
         action: Annotated[Literal["get", "list"], Field(
             description="Changelist query action: get retrieves specific changelist details, list returns all changelists matching filters"
@@ -71,7 +71,7 @@ def register(server: "P4MCPServer") -> None:
     if server.readonly:
         return
 
-    @server.mcp.tool(tags=["write", "changelists"])
+    @server.mcp.tool(tags=["write", "changelists"], annotations={"readOnlyHint": False, "destructiveHint": True})
     async def modify_changelists(
         action: Annotated[Literal["create", "update", "submit", "delete", "move_files"], Field(
             description="Changelist modification action: create makes new changelist, update modifies description, submit commits changes, delete removes changelist, move_files reorganizes files between changelists"
