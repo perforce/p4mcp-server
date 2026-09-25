@@ -1,6 +1,6 @@
-from typing import Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, List, Optional
 from .common import BaseParams, PaginatedParams
-from pydantic import Field, model_validator, field_validator
+from pydantic import Field, StringConstraints, model_validator, field_validator
 from enum import Enum
 import re
 
@@ -154,6 +154,7 @@ class ReviewModifyAction(str, Enum):
     DELETE_PARTICIPANTS = "delete_participants"
     LEAVE = "leave"
     OBLITERATE = "obliterate"
+    EDIT_COMMENT = "edit_comment"
 
 class FixStatus(str, Enum):
     OPEN = "open"
@@ -162,6 +163,8 @@ class FixStatus(str, Enum):
 class TaskState(str, Enum):
     OPEN = "open"
     COMMENT = "comment"
+    ADDRESSED = "addressed"
+    VERIFIED = "verified"
 
 class NotifyMode(str, Enum):
     IMMEDIATE = "immediate"
@@ -177,21 +180,25 @@ class CommentContext(BaseParams):
         examples=["//depot/path/to/file.txt"]
     )
     leftLine: Optional[int] = Field(
-        default="null",
+        default=None,
         ge=1,
         description="leftline optional, but if specified, you must also specify the rightline and " \
         "content parameters. Integer: Left-side diff line number to attach the inline comment to. " \
         "Valid only for changes and reviews topics."
     )
     rightLine: Optional[int] = Field(
-        default="null",
+        default=None,
         ge=1,
         description="rightline optional, but if specified, you must also specify the leftline and " \
         "content parameters. Integer: Right-side diff line number to attach the inline comment to. " \
         "Valid only for changes and reviews topics."
     )
-    content: Optional[List[str]] = Field(
-        default="null",
+    # NOTE: strip_whitespace=False is scoped to the content item type only so Swarm's
+    # exact-line-match anchoring data (leading indentation + trailing '\n') survives
+    # BaseParams' model-wide str_strip_whitespace=True. The `file` field intentionally
+    # keeps that trimming so stray whitespace in an LLM-supplied depot path self-heals.
+    content: Optional[List[Annotated[str, StringConstraints(strip_whitespace=False)]]] = Field(
+        default=None,
         description="content optional, but if specified, you must also specify the leftline and rightline " \
         "parameters. Array of strings: Provide the content of the codeline the comment is on and the four " \
         "preceding codelines. Always add a newline character ('\n') to the end of each line in the array. ",
@@ -393,8 +400,9 @@ class ModifyReviewsParams(BaseParams):
     )
     task_state: Optional[TaskState] = Field(
         default=None,
-        description="Task state (optional for add_comment)",
-        examples=["open"]
+        description="Task state. add_comment accepts only 'open'|'comment'; "
+        "edit_comment additionally accepts 'addressed'|'verified'",
+        examples=["open", "addressed", "verified"]
     )
     notify: Optional[NotifyMode] = Field(
         default=None,
@@ -404,7 +412,8 @@ class ModifyReviewsParams(BaseParams):
 
     comment_id: Optional[int] = Field(
         default=None,
-        description="Parent comment ID (reply_comment)",
+        description="Comment ID (required for reply_comment, edit_comment, "
+        "mark_comment_read/unread)",
         examples=[987]
     )
 
@@ -441,10 +450,17 @@ class ModifyReviewsParams(BaseParams):
             if not getattr(self, field, None):
                 raise ValueError(f"{label or field} is required for action: {a}")
 
+        # Actions that do NOT require review_id (create/archive are review-less;
+        # edit_comment is comment-scoped and targets a comment by comment_id alone).
+        no_review_id = [
+            ReviewModifyAction.CREATE,
+            ReviewModifyAction.ARCHIVE_INACTIVE,
+            ReviewModifyAction.EDIT_COMMENT,
+        ]
+
         # Actions requiring review_id
-        if a not in [ReviewModifyAction.CREATE, ReviewModifyAction.ARCHIVE_INACTIVE] and a != ReviewModifyAction.CREATE:
-            if a not in [ReviewModifyAction.ARCHIVE_INACTIVE] and not self.review_id:
-                raise ValueError(f"review_id is required for action: {a}")
+        if a not in no_review_id and not self.review_id:
+            raise ValueError(f"review_id is required for action: {a}")
 
         if a == ReviewModifyAction.CREATE:
             need("change_id", "change_id")
@@ -464,11 +480,25 @@ class ModifyReviewsParams(BaseParams):
         elif a == ReviewModifyAction.ADD_COMMENT:
             need("review_id")
             need("body", "body")
+            # add_comment may only open a task or leave a plain comment; the
+            # addressed/verified lifecycle states are reachable via edit_comment.
+            # (use_enum_values=True → task_state is a plain string here.)
+            if self.task_state and self.task_state not in ("open", "comment"):
+                raise ValueError(
+                    "task_state must be 'open' or 'comment' for add_comment action"
+                )
 
         elif a == ReviewModifyAction.REPLY_COMMENT:
             need("review_id")
             need("comment_id", "comment_id")
             need("body", "body")
+
+        elif a == ReviewModifyAction.EDIT_COMMENT:
+            need("comment_id", "comment_id")
+            if not self.body and not self.task_state:
+                raise ValueError(
+                    "At least one of body or task_state is required for edit_comment action"
+                )
 
         elif a == ReviewModifyAction.ARCHIVE_INACTIVE:
             need("not_updated_since", "not_updated_since")

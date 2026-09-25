@@ -15,11 +15,12 @@ logger = logging.getLogger(__name__)
 class P4MCPServer:
     """Perforce MCP Server with improved structure"""
 
-    def __init__(self, session_id: str = None, readonly: bool = True, toolsets: list = [], search_transform: str = None, ssl_verify=None, log_dir: str = None, max_results=None, max_scan_rows=None):
+    def __init__(self, session_id: str = None, readonly: bool = True, toolsets: list = None, search_transform: str = None, ssl_verify=None, log_dir: str = None, max_results=None, max_scan_rows=None, p4dam_api_key: str = None):
         self.readonly = readonly
-        self.toolsets = toolsets
+        self.toolsets = toolsets or []
         self.session_id = session_id
         self.search_transform = search_transform
+        self.p4dam_api_key = p4dam_api_key
 
         # Load P4 config (logging is already configured in main.py)
         self.p4config = Config.load()
@@ -78,6 +79,7 @@ class P4MCPServer:
         so that discovery works inside PyInstaller binaries.
         """
         from .services import changelist_services
+        from .services import p4dam_services
         from .services import file_services
         from .services import job_services
         from .services import review_services
@@ -88,6 +90,7 @@ class P4MCPServer:
 
         _SERVICE_MODULES = [
             changelist_services,
+            p4dam_services,
             file_services,
             job_services,
             review_services,
@@ -107,6 +110,12 @@ class P4MCPServer:
                 continue
             if module_name == "review_services":
                 all_services[module_name] = cls(self.p4_manager, verify_ssl=self.p4config.ssl_verify)
+            elif module_name == "p4dam_services":
+                all_services[module_name] = cls(
+                    self.p4_manager,
+                    api_key=self.p4dam_api_key,
+                    verify_ssl=self.p4config.ssl_verify,
+                )
             else:
                 all_services[module_name] = cls(self.p4_manager)
 

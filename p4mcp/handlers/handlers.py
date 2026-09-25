@@ -2,6 +2,7 @@ import inspect
 import logging
 
 from . import changelist_handlers
+from . import p4dam_handlers
 from . import file_handlers
 from . import job_handlers
 from . import review_handlers
@@ -16,6 +17,7 @@ logger = logging.getLogger(__name__)
 # modules inside a PyInstaller binary, so we enumerate them here.
 _HANDLER_MODULES = [
     changelist_handlers,
+    p4dam_handlers,
     file_handlers,
     job_handlers,
     review_handlers,

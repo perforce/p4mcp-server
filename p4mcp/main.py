@@ -38,8 +38,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--toolsets",
         nargs='+',
-        default=["files", "changelists", "shelves", "workspaces", "jobs", "reviews", "streams"],
-        help="List of toolsets to enable (default: files, changelists, shelves, workspaces, jobs, reviews, streams)"
+        default=["files", "changelists", "shelves", "workspaces", "jobs", "reviews", "streams", "p4dam"],
+        help="List of toolsets to enable (default: files, changelists, shelves, workspaces, jobs, reviews, streams, p4dam)"
     )
     parser.add_argument(
         "--allow-usage",
@@ -66,6 +66,7 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Path to a custom CA certificate bundle (PEM) for Swarm API requests"
     )
+
     parser.add_argument(
         "--log-dir",
         type=str,
@@ -169,6 +170,7 @@ def main() -> None:
                 )
         # Determine SSL verify: --ca-bundle > --ssl-no-verify > env vars > default (True)
         ssl_verify = resolve_ssl_verify(args)
+        p4dam_api_key = os.environ.get("P4DAM_API_KEY", "").strip() or None
         server = P4MCPServer(
             session_id=session_id,
             readonly=args.readonly,
@@ -178,6 +180,7 @@ def main() -> None:
             log_dir=log_dir,
             max_results=args.max_results,
             max_scan_rows=args.max_scan_rows,
+            p4dam_api_key=p4dam_api_key,
         )
         if args.transport == "http":
             logger.info(f"Starting P4 MCP Server with HTTP transport on port {args.port}")

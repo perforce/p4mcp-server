@@ -72,6 +72,30 @@ class QueryFilesParams(PaginatedParams):
             "info/metadata results."
         )
     )
+    ranges: Optional[List[List[int]]] = Field(
+        default=None,
+        description=(
+            "Optional line ranges to retrieve for the content action only. Each "
+            "inner list is a [start, end] pair, 1-based and inclusive (e.g. "
+            "[[10,20],[50,60]]). When set, the response carries a 'chunks' array "
+            "with one entry per range instead of the whole file."
+        ),
+        examples=[[[10, 20], [50, 60]]]
+    )
+
+    @model_validator(mode='after')
+    def validate_ranges(self):
+        """Validate optional content line ranges (start >= 1, start <= end)."""
+        if self.ranges is not None:
+            for rng in self.ranges:
+                if len(rng) != 2:
+                    raise ValueError(f'range must be a [start, end] pair, got {rng}')
+                start, end = rng
+                if start < 1:
+                    raise ValueError(f'range start must be >= 1, got {rng}')
+                if start > end:
+                    raise ValueError(f'range start must be <= end, got {rng}')
+        return self
 
     @model_validator(mode='after')
     def validate_diff_params(self):

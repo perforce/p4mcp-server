@@ -21,6 +21,7 @@ POST endpoints:
 - append_participants : POST /api/v11/reviews/{id}/participants
 - add_review_comment : POST /api/v11/reviews/{id}/comments
 - reply_to_comment : POST /api/v11/reviews/{id}/comments
+- edit_comment : POST /api/v11/comments/{id}/edit
 - append_change_to_review : POST /api/v11/reviews/{id}/appendchange
 - replace_review_with_change : POST /api/v11/reviews/{id}/replacewithchange
 - join_review : POST /api/v11/reviews/{id}/join
@@ -510,9 +511,11 @@ class ReviewServices:
                     payload["context"]["leftLine"] = context.leftLine
                 if context.rightLine is not None:
                     payload["context"]["rightLine"] = context.rightLine
-                if context.content:
-                    # AI is adding random content so for now we skip adding empty content
-                    payload["context"]["content"] = []
+                if context.content is not None:
+                    # Swarm anchors inline comments by exact-matching these content
+                    # lines against the diff, so forward the caller-supplied lines
+                    # verbatim (including indentation and trailing newlines).
+                    payload["context"]["content"] = context.content
                 if context.version is not None:
                     payload["context"]["version"] = context.version
                 if context.attribute:
@@ -554,9 +557,51 @@ class ReviewServices:
             logger.error(f"Failed to reply to comment '{comment_id}' in review '{review_id}': {e}")
             return {"status": "error", "message": str(e)}
         
+    async def edit_comment(
+            self,
+            comment_id: int,
+            body: Optional[str] = None,
+            task_state: Optional[str] = None,
+            notify: Optional[str] = None,
+        ) -> Dict[str, Any]:
+        """POST /api/v11/comments/{id}/edit - Edit an existing comment
+
+        Comment-scoped: targets a comment by comment_id alone; review_id is
+        neither required nor sent. Only the fields the caller supplies are
+        forwarded so omitted fields are left untouched on the server.
+
+        Args:
+            comment_id = "1234"
+            body = "Updated comment text."   # only sent when non-empty (truthy)
+            task_state = "open"|"comment"|"addressed"|"verified"
+            notify = "delayed"|"immediate"   # forwarded as a query parameter
+        """
+        try:
+            auth = await self._get_auth()
+            api_base = await self._get_api_base()
+            url = f"{api_base}/comments/{comment_id}/edit"
+
+            params = {}
+            if notify:
+                params["notify"] = notify
+
+            payload: Dict[str, Any] = {}
+            # A task-state-only edit must never blank the body, so include body
+            # only when it is non-empty (truthy) — matching the model validator.
+            if body:
+                payload["body"] = body
+            if task_state:
+                payload["taskState"] = task_state
+
+            r = requests.post(url, auth=auth, params=params, json=payload, verify=self.verify_ssl)
+            return {"status": "success", "message": self._handle_response(r)}
+        except Exception as e:
+            logger.error(f"Failed to edit comment '{comment_id}': {e}")
+            return {"status": "error", "message": str(e)}
+
     async def append_change_to_review(
-            self, 
-            review_id: int, 
+            self,
+            review_id: int,
             change_id: int
         ) -> Dict[str, Any]:
         """POST /api/v11/reviews/{id}/appendchange - Append a changelist to a pre-commit review"""

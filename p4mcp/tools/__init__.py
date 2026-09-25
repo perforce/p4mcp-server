@@ -13,6 +13,7 @@ from .shelve_tools import register as register_shelve_tools
 from .job_tools import register as register_job_tools
 from .review_tools import register as register_review_tools
 from .stream_tools import register as register_stream_tools
+from .p4dam_tools import register as register_p4dam_tools
 
 ALL_REGISTRARS = [
     register_server_tools,
@@ -23,6 +24,7 @@ ALL_REGISTRARS = [
     register_job_tools,
     register_review_tools,
     register_stream_tools,
+    register_p4dam_tools,
 ]
 
 __all__ = [
@@ -35,4 +37,5 @@ __all__ = [
     "register_job_tools",
     "register_review_tools",
     "register_stream_tools",
+    "register_p4dam_tools",
 ]

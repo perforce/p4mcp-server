@@ -1,4 +1,3 @@
-
 <p align="center">
   <img src="./icons/logo-p4mcp-reg.svg" alt="Perforce P4 MCP Server" width="480" />
 </p><br>
@@ -13,7 +12,7 @@
 <h1>Perforce P4 MCP Server</h1>
 
 <p>
-  <strong>Perforce P4 MCP Server is a Model Context Protocol (MCP) server that integrates with the Perforce P4 version control system. It is built on FastMCP with direct P4 Python bindings to expose safe, structured read/write tools for changelists, files, shelves, workspaces, jobs, reviews, and server metadata.</strong>
+  <strong>Perforce P4 MCP Server is a Model Context Protocol (MCP) server that integrates with the Perforce P4 version control system. It is built on FastMCP with direct P4 Python bindings to expose safe, structured read/write tools for changelists, files, shelves, workspaces, jobs, reviews, and server metadata. It also integrates with P4 DAM through its REST API to manage <a href="#features">resources</a>.</strong>
 </p>
 
 <nav aria-label="Quick navigation">
@@ -41,8 +40,9 @@
 
 - **Comprehensive P4 integration**: Read/write tools across files, changelists, shelves, workspaces, jobs, reviews, streams, and server information.
 - **Code review workflows**: P4 Code Review support for review discovery, voting, state transitions, commenting, and participant management.
+- **P4 DAM integration**: Access P4 DAM assets and metadata through MCP-compatible AI assistants. Search for assets, retrieve metadata, manage reviews, create asset bundles, update asset tags, and browse projects. To learn more, see [Configure P4 DAM access for P4 MCP Server](https://help.perforce.com/helix-core/helix-dam/current/Content/HTH-Admin/DAM/configure-p4dam-to-p4-mcp.html) in the P4 DAM documentation.
 - **Safety first**: Read-only mode by default, ownership checks, interactive MCP elicitation (PROCEED/CANCEL) for destructive delete and obliterate operations.
-- **Flexible toolsets**: Configure which tool categories to enable: server, files, changelists, shelves, workspaces, jobs, reviews, and streams.
+- **Flexible toolsets**: Configure which tool categories to enable: server, files, changelists, shelves, workspaces, jobs, reviews, streams, and p4dam.
 - **Robust logging**: Application and session logging to the `logs/` directory.
 - **Optional telemetry**: Consent-gated usage statistics. Disabled by default.
 - **Cross platform**: Supported on macOS, Linux and Windows with pre-built binaries.
@@ -141,7 +141,8 @@ Add the following to your `mcp.json`:
       "env": {
         "P4PORT": "ssl:perforce.example.com:1666",
         "P4USER": "your_username",
-        "P4CLIENT": "your_workspace"
+        "P4CLIENT": "your_workspace",
+        "P4DAM_API_KEY": "your_api_key"
       },
       "args": [
         "--readonly", "--allow-usage"
@@ -196,6 +197,7 @@ Add the following to your `mcp.json`:
                 "-e", "P4PORT=ssl:perforce.example.com:1666",
                 "-e", "P4USER=your_username",
                 "-e", "P4CLIENT=your_workspace",
+                "-e", "P4DAM_API_KEY=your_api_key",
                 "-v", "/Users/your_username/.p4tickets:/home/mcpuser/.p4tickets:ro",
                 "ghcr.io/perforce/p4mcp-server:latest"
             ]
@@ -225,6 +227,12 @@ Using P4 tickets:
 ```
 
 > **Note:** Use the full path to your tickets file (not `~`). After running `p4 login`, restart the MCP server to pick up the new ticket.
+
+> **Note:** By default the container starts as root, copies the bind-mounted tickets file to a location readable by the non-root `mcpuser`, then drops privileges (via `gosu`) so the server runs as `mcpuser`. This auto-copy lets an owner-only (`0600`) tickets file owned by a foreign uid work on runtimes that preserve host ownership (native Linux Docker/podman). A `:ro` bind mount of the ticket is supported — the file is copied, not modified in place (this is distinct from a read-only container root filesystem; see below). Note the auto-copy runs **only when the container starts as root** (the default); forcing a non-root uid or a read-only root filesystem changes this behavior, as described below.
+
+> **Kubernetes / restricted (non-root-enforced) profiles:** the image intentionally starts as root and drops to `mcpuser` (uid 1000) via `gosu`, so the server always runs non-root — both paths are supported. For `runAsNonRoot` / restricted PodSecurity / OpenShift restricted SCC, set `securityContext.runAsUser: 1000` (and `fsGroup: 1000` when mounting the ticket). In that mode the entrypoint's root-only ticket copy is skipped, so the mounted ticket must already be readable by uid 1000 (owner-matched mount, `-e P4PASSWD="your_ticket_content"`, or `podman -v <host>:/home/mcpuser/.p4tickets:U`).
+
+> **Read-only root filesystem (`--read-only` / `readOnlyRootFilesystem`):** provide a writable/tmpfs `/home/mcpuser` (e.g. `--tmpfs /home/mcpuser`) so the ticket copy can be written; otherwise the ticket copy fails and P4 will report a normal auth error.
 
 Using a password:
 ```bash
@@ -268,6 +276,7 @@ Example configuration with client root mounted:
                 "-e", "P4PORT=ssl:perforce.example.com:1666",
                 "-e", "P4USER=your_username",
                 "-e", "P4CLIENT=your_workspace",
+                "-e", "P4DAM_API_KEY=your_api_key",
                 "-v", "/Users/your_username/.p4tickets:/home/mcpuser/.p4tickets",
                 "-v", "/path/to/client/root:/path/to/client/root",
                 "ghcr.io/perforce/p4mcp-server:latest"
@@ -328,6 +337,7 @@ docker run --rm -p 8000:8000 \
   -e P4PORT=ssl:perforce.example.com:1666 \
   -e P4USER=your_username \
   -e P4PASSWD=YOUR_TICKET \
+  -e P4DAM_API_KEY=your_api_key \
   ghcr.io/perforce/p4mcp-server:latest \
   python3 -m p4mcp.main --readonly --transport http --port 8000
 ```
@@ -370,7 +380,8 @@ Add the following to your `mcp.json`:
 >         "env": {
 >            "P4PORT": "ssl:perforce.example.com:1666",
 >            "P4USER": "your_username",
->            "P4CLIENT": "your_workspace"
+>            "P4CLIENT": "your_workspace",
+>            "P4DAM_API_KEY": "your_api_key"
 >         }
 >      }
 >    }
@@ -423,7 +434,8 @@ See the [Claude Code MCP docs](https://docs.anthropic.com/en/docs/claude-code/mc
       "env": {
         "P4PORT": "ssl:perforce.example.com:1666",
         "P4USER": "your_username",
-        "P4CLIENT": "your_workspace"
+        "P4CLIENT": "your_workspace",
+        "P4DAM_API_KEY": "your_api_key"
       }
     }
   }
@@ -439,7 +451,8 @@ See the [Claude Code MCP docs](https://docs.anthropic.com/en/docs/claude-code/mc
       "env": {
         "P4PORT": "ssl:perforce.example.com:1666",
         "P4USER": "your_username",
-        "P4CLIENT": "your_workspace"
+        "P4CLIENT": "your_workspace",
+        "P4DAM_API_KEY": "your_api_key"
       },
       "args": [
         "--readonly", "--allow-usage"
@@ -463,7 +476,8 @@ See the [Cursor MCP documentation](https://docs.cursor.com/en/context/mcp) for m
       "env": {
         "P4PORT": "ssl:perforce.example.com:1666",
         "P4USER": "your_username",
-        "P4CLIENT": "your_workspace"
+        "P4CLIENT": "your_workspace",
+        "P4DAM_API_KEY": "your_api_key"
       },
       "args": [
         "--readonly", "--allow-usage"
@@ -487,7 +501,8 @@ See the [Eclipse MCP documentation](https://eclipse.dev/lmos/docs/arc/mcp) for m
       "env": {
         "P4PORT": "ssl:perforce.example.com:1666",
         "P4USER": "your_username",
-        "P4CLIENT": "your_workspace"
+        "P4CLIENT": "your_workspace",
+        "P4DAM_API_KEY": "your_api_key"
       },
       "args": [
         "--readonly", "--allow-usage"
@@ -510,7 +525,8 @@ See the [Kiro MCP documentation](https://kiro.dev/docs/mcp/configuration/) for m
       "env": {
         "P4PORT": "ssl:perforce.example.com:1666",
         "P4USER": "your_username",
-        "P4CLIENT": "your_workspace"
+        "P4CLIENT": "your_workspace",
+        "P4DAM_API_KEY": "your_api_key"
       },
       "args": [
         "--readonly", "--allow-usage"
@@ -535,7 +551,8 @@ See the [VS Code documentation](https://code.visualstudio.com/docs/copilot/custo
       "env": {
         "P4PORT": "ssl:perforce.example.com:1666",
         "P4USER": "your_username",
-        "P4CLIENT": "your_workspace"
+        "P4CLIENT": "your_workspace",
+        "P4DAM_API_KEY": "your_api_key"
       },
       "args": [
         "--readonly", "--allow-usage"
@@ -559,7 +576,8 @@ See the [Windsurf MCP documentation](https://docs.windsurf.com/windsurf/cascade/
       "env": {
         "P4PORT": "ssl:perforce.example.com:1666",
         "P4USER": "your_username",
-        "P4CLIENT": "your_workspace"
+        "P4CLIENT": "your_workspace",
+        "P4DAM_API_KEY": "your_api_key"
       },
       "args": [
         "--readonly", "--allow-usage"
@@ -593,6 +611,13 @@ See the [Windsurf MCP documentation](https://docs.windsurf.com/windsurf/cascade/
 - `OTEL_EXPORTER_OTLP_ENDPOINT` - OTLP collector endpoint for telemetry export. Default: `https://grpc.public.prd.shared.perforce.com`.
 - `OTEL_EXPORTER_OTLP_PROTOCOL` - OTLP export protocol. Only `grpc` is supported; other values fall back to `grpc` with a warning.
 
+### P4 DAM environment variables
+- `P4DAM_API_KEY` - P4 DAM API key. Sent as `Authorization: account_key='<key>'` with all P4 DAM API requests. Requires an active P4 DAM session. **When unset, P4 DAM tools are not registered.** The toolset is silently skipped at startup.
+
+> **P4 DAM URL discovery:** The P4 DAM base URL is read from the `P4.HTH.URL` P4 property on the server. If the property is unset, P4 DAM tool calls fail at runtime.
+>
+> **SSL for P4 DAM:** P4 DAM API requests use the same SSL configurations as Swarm — `P4MCP_TLS_CA_MODE`, `--ca-bundle` / `P4MCP_CA_BUNDLE`, and `--ssl-no-verify` / `P4MCP_SSL_VERIFY`.
+
 ### Supported arguments
 
 - `--readonly` - Control write operations.
@@ -604,7 +629,7 @@ See the [Windsurf MCP documentation](https://docs.windsurf.com/windsurf/cascade/
   - If missing, disables all usage statistics.
 
 - `--toolsets` - Specify which tool categories to enable.
-  - Available: `files`, `changelists`, `shelves`, `workspaces`, `jobs`, `reviews`, `streams`
+  - Available: `files`, `changelists`, `shelves`, `workspaces`, `jobs`, `reviews`, `streams`, `p4dam`
   - Default: All toolsets enabled.
   - `query_server` is always available regardless of the `--toolsets` setting.
 
@@ -992,8 +1017,9 @@ The MCP server checks properties in this order. Each property is resolved indepe
   - `annotations` - Get file annotations with blame information
   - `search` - Search for files by name pattern (wildcard matching)
   - `grep` - Search for files by content pattern (text search)
-- **Parameters**: `file_path`, `file2` (for diff), `pattern` (for search/grep), `case_insensitive` (for grep), `max_results`, `diff2` (boolean)
-- **Use cases**: Code analysis, file comparison, history tracking, blame analysis, file discovery, content search
+- **Parameters**: `file_path`, `file2` (for diff), `pattern` (for search/grep), `case_insensitive` (for grep), `max_results`, `diff2` (boolean), `ranges` (for content)
+  - `ranges` - Optional list of `[start, end]` line pairs, 1-based and inclusive (e.g. `[[10, 20], [50, 60]]`). Applies to the `content` action only. When set, the response returns a `chunks` array with one entry per range instead of the whole file.
+- **Use cases**: Code analysis, file comparison, history tracking, blame analysis, file discovery, content search, retrieving specific line ranges from large files
 
 </details>
 
@@ -1077,6 +1103,102 @@ The MCP server checks properties in this order. Each property is resolved indepe
 
 </details>
 
+<details>
+  <summary><strong><code>query_p4dam_assets</code></strong> - Search P4 DAM assets by keyword or filters</summary>
+
+- **Parameters**: `search_term`, `project_ids`, `repository_ids`, `path`, `tag`, `file_extension`, `user`, `all_revisions`, `max_results`, `offset`
+- **Use cases**: Asset discovery, filtering by project/repository/tag/extension, browsing P4 DAM content. Use when you don't have a depot path yet.
+
+</details>
+
+<details>
+  <summary><strong><code>query_p4dam_asset</code></strong> - Fetch full metadata for a single P4 DAM asset</summary>
+
+- **Parameters**: `depot_path` (required), `identifier`, `project_id`, `repository_id`, `include`
+- **Use cases**: Fetching commit info, asset bundles, weblinks, custom attributes, and project/repository matches for a known asset. Use after `query_p4dam_assets` to get full detail on a specific file.
+
+</details>
+
+<details>
+  <summary><strong><code>query_p4dam_projects</code></strong> - List P4 DAM projects</summary>
+
+- **Parameters**: `search_term`, `limit`, `offset`
+- **Use cases**: Discovering available projects before creating an asset bundle or file review, resolving project IDs for other calls.
+
+</details>
+
+<details>
+  <summary><strong><code>query_p4dam_repositories</code></strong> - List repositories in a P4 DAM project</summary>
+
+- **Parameters**: `project_id` (required), `search_term`, `limit`, `offset`
+- **Use cases**: Finding repository type (`helix_stream` or `helix_classic`) and `linked_streams` — needed to supply `stream_path` or discover branches when creating asset bundles or file reviews.
+
+</details>
+
+<details>
+  <summary><strong><code>query_p4dam_helix_classic_branches</code></strong> - List Helix Classic branches in a repository</summary>
+
+- **Parameters**: `project_id` (required), `repository_id` (required), `limit`, `offset`
+- **Use cases**: Finding the branch ID required when creating an asset bundle or file review in a Helix Classic repository.
+
+</details>
+
+<details>
+  <summary><strong><code>fetch_p4dam_media</code></strong> - Fetch and render a P4 DAM media URL as an image</summary>
+
+- **Parameters**: `url` (required — `thumbnail_url`, `preview_url`, `sprite_url`, or `file_url` from asset results)
+- **Use cases**: Rendering thumbnails, previews, and sprite sheets for image assets directly in the client. For non-image files returns MIME type and size instead of image content. Pass URLs from `query_p4dam_assets` or `query_p4dam_asset` results — only `thumbnail_url`, `preview_url`, and `sprite_url` are present for image files.
+
+</details>
+
+<details>
+  <summary><strong><code>query_p4dam_file_reviews</code></strong> - List file (asset) reviews for a project</summary>
+
+- **Parameters**: `project_id` (required), `depot_path`, `include`, `limit`, `offset`
+- **Use cases**: Browsing active reviews in a project, filtering by depot path, discovering review UUIDs for detail lookups.
+
+</details>
+
+<details>
+  <summary><strong><code>query_p4dam_file_review</code></strong> - Fetch a single file review by UUID</summary>
+
+- **Parameters**: `project_id` (required), `review_id` (required)
+- **Use cases**: Retrieving full review detail — state, view_paths, asset_bundle, creator, and `download_url` for bundle reviews.
+
+</details>
+
+<details>
+  <summary><strong><code>query_p4dam_workflows</code></strong> - List P4 DAM workflows</summary>
+
+- **Parameters**: `include`, `limit`, `offset`
+- **Use cases**: Discovering available workflows and their states. Pass `include=['states']` to get all states in a single call — use the state `short_name` as the `state` parameter in file review operations.
+
+</details>
+
+<details>
+  <summary><strong><code>query_p4dam_workflow</code></strong> - Fetch a single workflow by short name or UUID</summary>
+
+- **Parameters**: `workflow_id` (required), `include`
+- **Use cases**: Inspecting a workflow's states (`kind`: open/review/done, `color`, `position`) and transition rules.
+
+</details>
+
+<details>
+  <summary><strong><code>query_p4dam_workflow_states</code></strong> - List states for a workflow</summary>
+
+- **Parameters**: `workflow_id` (required), `limit`, `offset`
+- **Use cases**: Listing all states with `short_name`, `kind`, `color`, and `position`. The `short_name` is the value to pass as `state` when creating or updating a file review.
+
+</details>
+
+<details>
+  <summary><strong><code>query_p4dam_custom_attribute_templates</code></strong> - List custom attribute templates for a project</summary>
+
+- **Parameters**: `project_id` (required)
+- **Use cases**: Discovering available custom attributes before setting values — returns each template's UUID, name, type (`text`, `single-select`, `multi-select`, `checkbox`), and `available_values` for select types. Pass the UUID to `update_p4dam_asset_custom_attributes`.
+
+</details>
+
 ### Modify tools (write operations)
 
 <details>
@@ -1140,6 +1262,7 @@ The MCP server checks properties in this order. Each property is resolved indepe
   - `delete_participants` - Remove participants from a review
   - `add_comment` - Add a comment to a review
   - `reply_comment` - Reply to an existing comment
+  - `edit_comment` - Edit an existing comment's body and/or task state
   - `append_change` - Add a changelist to an existing review
   - `replace_with_change` - Replace review content with a changelist
   - `join` - Join a review as a participant
@@ -1162,9 +1285,9 @@ The MCP server checks properties in this order. Each property is resolved indepe
   - `jobs`, `fix_status`, `cleanup` - Job linking and cleanup options for transitions
   - `users`, `groups` - Structured participant data for append/replace/delete
   - `body` - Comment body text
-  - `task_state` - Comment task state: `open`, `comment`
+  - `task_state` - Comment task state: `open`, `comment`, `addressed`, `verified`. `add_comment` accepts only `open` and `comment`; `addressed` and `verified` are reachable through `edit_comment`.
   - `notify` - Notification mode: `immediate`, `delayed`
-  - `comment_id` - Comment ID for replies or marking read/unread
+  - `comment_id` - Comment ID for replies, edits, or marking read/unread
   - `context` - Comment context (file, line numbers, content, version)
   - `not_updated_since`, `max_reviews` - Filters for archive_inactive
   - `new_author`, `new_description` - Values for update actions
@@ -1218,6 +1341,94 @@ The MCP server checks properties in this order. Each property is resolved indepe
   - `workspace_name`, `root`, `host`, `alt_roots` - Workspace creation parameters
 - **Safety**: Stream existence validation, locked stream detection, bound workspace warnings, open file checks for view-affecting changes
 - **Use cases**: Stream creation and management, branch propagation (merge/copy/integrate), spec conflict resolution, workspace provisioning
+
+</details>
+
+<details>
+  <summary><strong><code>create_p4dam_asset_bundle</code></strong> - Create a P4 DAM asset bundle</summary>
+
+- **Parameters**: `depot_path` (required, must end `.p4bundle`), `project` (required), `repository` (required), `view_paths` (required), `stream_path`, `helix_classic_branch`, `description`, `hero_file_path`
+- **Use cases**: Creating a named, scoped collection of depot files for review. Supply `stream_path` for Helix Stream repos, `helix_classic_branch` for Helix Classic repos.
+
+</details>
+
+<details>
+  <summary><strong><code>update_p4dam_asset_bundle</code></strong> - Update an existing asset bundle</summary>
+
+- **Parameters**: `bundle_id` (required), `description`, `view_paths`, `hero_file_path`
+- **Use cases**: Changing a bundle's description, adjusting its file scope (`view_paths`), or updating the cover image. `depot_path` is immutable after creation.
+
+</details>
+
+<details>
+  <summary><strong><code>delete_p4dam_asset_bundle</code></strong> - Delete a P4 DAM asset bundle</summary>
+
+- **Parameters**: `bundle_id` (required)
+- **Use cases**: Removing an asset bundle that is no longer needed. Irreversible.
+
+</details>
+
+<details>
+  <summary><strong><code>sync_p4dam_asset_bundle</code></strong> - Sync asset bundle files to a local workspace</summary>
+
+- **Parameters**: `view_paths` (required), `workspace_root` (required), `client_name`, `bundle_id`, `stream_path`
+- **Use cases**: Downloading an asset bundle's scoped files via `p4 sync`. Creates or reuses a named P4 client — subsequent syncs are incremental. Use `stream_path` for Helix Stream repos (applies `LimitView`, requires Perforce 2025.2+).
+
+</details>
+
+<details>
+  <summary><strong><code>create_p4dam_file_review</code></strong> - Create a P4 DAM asset review</summary>
+
+- **Parameters**: `project_id` (required), `name` (required), `depot_path` (required), `view_paths` (required), `state` (required), `repository`, `helix_classic_branch`, `asset_bundle`, `hero_file_path`, `description`, `position`, `base_commit_id`, `head_commit_id`
+- **Use cases**: Opening a review for a single asset or an asset bundle (`.p4bundle`). For bundle reviews, `asset_bundle` is auto-detected from `depot_path` when omitted.
+
+</details>
+
+<details>
+  <summary><strong><code>update_p4dam_file_review</code></strong> - Update a P4 DAM file review</summary>
+
+- **Parameters**: `project_id` (required), `review_id` (required), `state`, `name`, `view_paths`, `hero_file_path`, `description`, `position`
+- **Use cases**: Transitioning a review to a new workflow state, updating its name or description, adjusting view scope. State transitions must be permitted by the project workflow for the current user.
+
+</details>
+
+<details>
+  <summary><strong><code>delete_p4dam_file_review</code></strong> - Delete a P4 DAM file review</summary>
+
+- **Parameters**: `project_id` (required), `review_id` (required)
+- **Use cases**: Removing a review that is no longer needed. Irreversible. The API returns the deleted review object on success.
+
+</details>
+
+<details>
+  <summary><strong><code>update_p4dam_asset_tags</code></strong> - Add or remove asset tags and auto-tags</summary>
+
+- **Parameters**: `paths` (required — list of `{path, identifier?}`), `create`, `delete`, `delete_auto`, `propagatable`, `identifier`
+- **Use cases**: Tagging one or many assets in a single call. Supports individual files, specific revisions, and recursive folder paths (`//depot/folder/...`). `create` adds user tags, `delete` removes user tags, `delete_auto` removes auto-generated tags. Set `propagatable=true` to apply tags to the latest revision and all future revisions.
+
+</details>
+
+<details>
+  <summary><strong><code>create_p4dam_comment</code></strong> - Post a comment on a file review or file, or reply to a comment</summary>
+
+- **Parameters**: `type` (required), `content` (required), `project`, `repository`, `file_review`, `commit`, `path`, `stream_path`, `helix_classic_branch`, `comment`
+- **Use cases**: Comment on an asset bundle file review (`file_review`), a specific file within a review (`file_review_file`), a committed file or asset bundle without a review (`commit_file`), or reply to an existing comment (`comment`). Required parameters depend on type — see `type` description.
+
+</details>
+
+<details>
+  <summary><strong><code>update_p4dam_asset_custom_attributes</code></strong> - Set or remove custom attribute values for assets</summary>
+
+- **Parameters**: `paths` (required — list of `{path, identifier?}`), `create` (list of `{uuid, value}`), `delete` (list of attribute UUIDs to remove), `propagatable`
+- **Use cases**: Setting or clearing custom metadata on one or more assets. Discover available attributes and their UUIDs first with `query_p4dam_custom_attribute_templates`. `value` is a string for `text`/`single-select`/`checkbox` types and a list of strings for `multi-select`.
+
+</details>
+
+<details>
+  <summary><strong><code>regenerate_p4dam_preview</code></strong> - Regenerate an asset preview image</summary>
+
+- **Parameters**: `depot_path` (required), `commit_id` (required)
+- **Use cases**: Re-triggering preview generation when a preview is missing or outdated. `commit_id` is the changeset number from `query_p4dam_asset` results.
 
 </details>
 

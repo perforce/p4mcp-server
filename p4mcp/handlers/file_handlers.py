@@ -14,7 +14,10 @@ class FilesHandlers:
     @handle_errors
     async def _handle_query_files(self, params):
         if params.action == "content":
-            result = await self.file_services.get_file_content(params.file_path)
+            if params.ranges:
+                result = await self.file_services.get_file_content_ranges(params.file_path, params.ranges)
+            else:
+                result = await self.file_services.get_file_content(params.file_path)
         elif params.action == "history":
             result = await self.file_services.get_file_history(params.file_path, params.max_results or 100)
         elif params.action == "info":

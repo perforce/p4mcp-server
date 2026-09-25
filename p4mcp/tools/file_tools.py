@@ -55,12 +55,23 @@ def register(server: "P4MCPServer") -> None:
             default=False,
             description="Case-insensitive matching for grep action",
         )] = False,
+        ranges: Annotated[Optional[List[List[int]]], Field(
+            default=None,
+            description=(
+                "Optional line ranges for the content action only. Each inner "
+                "list is a [start, end] pair, 1-based inclusive. When set, the "
+                "response carries a 'chunks' array with one entry per range "
+                "instead of the whole file."
+            ),
+            examples=[[[10, 20], [50, 60]]],
+        )] = None,
     ) -> dict:
         """Get file content, history, info, diff, annotations, search by name, grep by content (READ permission)"""
         params = m.QueryFilesParams(
             action=action, file_path=file_path,
             file2=file2, diff2=diff2, max_results=max_results,
             pattern=pattern, case_insensitive=case_insensitive,
+            ranges=ranges,
         )
         return await handle_with_logging(server, "query", "files", params, "query_files", ctx)
 

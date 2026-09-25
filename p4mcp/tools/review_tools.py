@@ -128,6 +128,7 @@ def register(server: "P4MCPServer") -> None:
         action: Annotated[Literal[
             "create", "refresh_projects", "vote", "transition",
             "append_participants", "add_comment", "reply_comment",
+            "edit_comment",
             "append_change", "replace_with_change", "join",
             "archive_inactive", "mark_comment_read", "mark_comment_unread",
             "mark_all_comments_read", "mark_all_comments_unread",
@@ -199,6 +200,14 @@ def register(server: "P4MCPServer") -> None:
             description="Review version for comment attachment",
             examples=[1],
         )] = None,
+        comment_content: Annotated[Optional[List[str]], Field(
+            default=None,
+            description="Content lines used to anchor an inline comment to the correct diff "
+            "position (add_comment). Supply the code line the comment is on plus the four "
+            "preceding lines, each terminated with a newline character ('\\n'). Must be "
+            "supplied together with comment_left_line and comment_right_line.",
+            examples=[["def example_function():\n", "    pass\n"]],
+        )] = None,
         vote_value: Annotated[Optional[Literal["up", "down", "clear"]], Field(
             default=None,
             description="Vote value",
@@ -255,9 +264,10 @@ def register(server: "P4MCPServer") -> None:
             description="Comment body (required for add_comment, reply_comment)",
             examples=["Looks good."],
         )] = None,
-        task_state: Annotated[Optional[Literal["open", "comment"]], Field(
+        task_state: Annotated[Optional[Literal["open", "comment", "addressed", "verified"]], Field(
             default=None,
-            description="Task state",
+            description="Task state. add_comment accepts only 'open'|'comment'; "
+            "edit_comment additionally accepts 'addressed'|'verified'",
         )] = None,
         notify: Annotated[Optional[Literal["immediate", "delayed"]], Field(
             default=None,
@@ -265,7 +275,7 @@ def register(server: "P4MCPServer") -> None:
         )] = None,
         comment_id: Annotated[Optional[int], Field(
             default=None,
-            description="Parent comment ID (reply_comment, mark_comment_read/unread)",
+            description="Comment ID (reply_comment, edit_comment, mark_comment_read/unread)",
             examples=[987],
         )] = None,
         not_updated_since: Annotated[Optional[str], Field(
@@ -301,7 +311,7 @@ def register(server: "P4MCPServer") -> None:
 
         # Reconstruct comment context from flat fields
         comment_context = None
-        if any([comment_file_path, comment_left_line, comment_right_line, comment_version]):
+        if any([comment_file_path, comment_left_line, comment_right_line, comment_version, comment_content]):
             # Build context dict dynamically - only include non-None fields
             context_dict = {}
             if comment_file_path is not None:
@@ -310,6 +320,8 @@ def register(server: "P4MCPServer") -> None:
                 context_dict["leftLine"] = comment_left_line
             if comment_right_line is not None:
                 context_dict["rightLine"] = comment_right_line
+            if comment_content is not None:
+                context_dict["content"] = comment_content
             if comment_version is not None:
                 context_dict["version"] = comment_version
             comment_context = review_m.CommentContext(**context_dict) if context_dict else None

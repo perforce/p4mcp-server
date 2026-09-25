@@ -90,7 +90,7 @@ def _serialize_depot_file(depot_file: Any) -> Dict[str, Any]:
 
 class FileServices:
     """File services for file operations"""
-    
+
     def __init__(self, connection_manager: P4ConnectionManager):
         self.connection_manager = connection_manager
 
@@ -104,6 +104,41 @@ class FileServices:
             except P4Exception as e:
                 logger.error(f"P4Error: Failed to get file content '{file_path}': {e}")
                 return {"status": "error", "message": str(e), "metadata": []}
+
+    async def get_file_content_ranges(self, file_path: str, ranges: List[List[int]]) -> Dict[str, Any]:
+        """Get specific line ranges of a file in the depot.
+
+        Runs a single `p4 print` and slices the requested [start, end] ranges
+        (1-based, inclusive) from the content, returning one chunk per range in
+        the order supplied. Ranges extending past EOF return the available
+        lines; ranges fully beyond EOF return empty content.
+
+        Args:
+            file_path: Depot or local file path to print.
+            ranges: List of [start, end] pairs, 1-based inclusive.
+
+        Returns:
+            Dict with "status", "file", and "chunks" (list of
+            {"start": int, "end": int, "content": str} dicts); or
+            {"status": "error", "message": str} on P4Exception.
+        """
+        async with self.connection_manager.get_connection() as p4:
+            try:
+                result = p4.run_print(file_path)
+                content = _join_print_result(result)["content"]
+                lines = content.split("\n")
+                chunks: List[Dict[str, Any]] = []
+                for start, end in ranges:
+                    selected = lines[start - 1:end]
+                    chunks.append({
+                        "start": start,
+                        "end": end,
+                        "content": "\n".join(selected),
+                    })
+                return {"status": "success", "file": file_path, "chunks": chunks}
+            except P4Exception as e:
+                logger.error(f"P4Error: Failed to get file content ranges '{file_path}': {e}")
+                return {"status": "error", "message": str(e)}
 
     async def get_file_history(self, file_path: str, limit: int=100) -> List[Dict[str, Any]]:
         """Get history of a file in the depot."""
@@ -312,7 +347,7 @@ class FileServices:
         """Move/rename files"""
         if len(source_paths) != len(target_paths):
             raise ValueError("Source and target paths must have the same length")
-        
+
         async with self.connection_manager.get_connection() as p4:
             try:
                 result = []
@@ -367,4 +402,4 @@ class FileServices:
                 logger.error(f"P4Error: Failed to resolve files in changelist '{changelist}': {e}")
                 return {"status": "error", "message": str(e)}
 
-    
+

@@ -1,9 +1,9 @@
-fastmcp==3.3.1
+fastmcp==3.4.4
 grpcio==1.81.1
 opentelemetry-api==1.43.0
 opentelemetry-sdk==1.43.0
 opentelemetry-exporter-otlp-proto-grpc==1.43.0
-p4python==2026.1.2974490
+p4python==2026.1.3027817
 pydantic==2.13.4
 requests==2.34.2
 truststore==0.10.4

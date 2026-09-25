@@ -274,7 +274,7 @@ class P4ConnectionManager:
         self._is_connected = False
         self._session = P4Session(config, save_to_file=save_session_to_file)
         self.session_id = self._session.session_id
-    
+
     async def initialize(self):
         """Initialize P4 connection"""
         try:
@@ -326,6 +326,7 @@ class P4ConnectionManager:
                     self._connection.connect()
                 except Exception as reconnect_error:
                     logger.error(f"Failed to reconnect: {reconnect_error}")
+                raise P4Exception(f"Failed to reconnect to P4 Server: {e}") from e
 
             raise
 

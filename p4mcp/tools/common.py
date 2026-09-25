@@ -10,6 +10,8 @@ import logging
 from typing import TYPE_CHECKING, Literal
 
 from fastmcp import Context
+from mcp import McpError
+from mcp.types import METHOD_NOT_FOUND
 from pydantic import BaseModel, Field, create_model
 
 if TYPE_CHECKING:
@@ -68,19 +70,24 @@ async def handle_modify_with_delete_gate(
         result = {"status": "warning", "action": params.action, "message": delete_warning_msg}
         process_and_log(server, tool_name, result, ctx)
 
-        elicit_result = await ctx.elicit(
-            message=f"⚠️ This action is irreversible. Do you want to continue?" ,
-            response_type=create_model(
-                "ConfirmAction",
-                select_one=(
-                    Literal["PROCEED", "CANCEL"],
-                    Field(
-                        title=delete_warning_msg,
-                        description="Select PROCEED to confirm, or CANCEL to abort.",
+        try:
+            elicit_result = await ctx.elicit(
+                message="⚠️ This action is irreversible. Do you want to continue?",
+                response_type=create_model(
+                    "ConfirmAction",
+                    select_one=(
+                        Literal["PROCEED", "CANCEL"],
+                        Field(
+                            title=delete_warning_msg,
+                            description="Select PROCEED to confirm, or CANCEL to abort.",
+                        ),
                     ),
                 ),
-            ),
-        )
+            )
+        except McpError as e:
+            if e.error.code == METHOD_NOT_FOUND:
+                return await handle_with_logging(server, "modify", resource, params, tool_name, ctx)
+            raise
 
         if elicit_result.action != "accept" or elicit_result.data.select_one != "PROCEED":
             cancelled = {"status": "cancelled", "action": params.action, "message": "Operation cancelled by user."}
