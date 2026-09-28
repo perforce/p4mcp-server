@@ -19,7 +19,7 @@ def register(server: "P4MCPServer") -> None:
         return
 
     # ── read ────────────────────────────────────────────────────────────
-    @server.mcp.tool(tags=["read", "workspaces"])
+    @server.mcp.tool(tags=["read", "workspaces"], annotations={"readOnlyHint": True})
     async def query_workspaces(
         action: Annotated[Literal["list", "get", "type", "status"], Field(
             description="Workspace query action: list returns all workspaces matching filters, get retrieves specific workspace spec, type identifies workspace category, status shows opened files and sync state"
@@ -51,7 +51,7 @@ def register(server: "P4MCPServer") -> None:
     if server.readonly:
         return
 
-    @server.mcp.tool(tags=["write", "workspaces"])
+    @server.mcp.tool(tags=["write", "workspaces"], annotations={"readOnlyHint": False, "destructiveHint": True})
     async def modify_workspaces(
         action: Annotated[Literal["create", "delete", "update", "switch"], Field(
             description="Workspace modification action: create makes new workspace, delete removes workspace, update modifies workspace spec, switch changes active workspace"

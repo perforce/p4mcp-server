@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 def register(server: "P4MCPServer") -> None:
-    @server.mcp.tool(tags=["read", "server"])
+    @server.mcp.tool(tags=["read", "server"], annotations={"readOnlyHint": True})
     async def query_server(
         action: Annotated[Literal["server_info", "current_user"], Field(
             description="Server query action: server_info returns P4 server metadata and version, current_user returns authenticated user details and permissions"
