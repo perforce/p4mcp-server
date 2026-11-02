@@ -1,10 +1,10 @@
 fastmcp==3.4.4
-grpcio==1.81.1
-opentelemetry-api==1.43.0
-opentelemetry-sdk==1.43.0
-opentelemetry-exporter-otlp-proto-grpc==1.43.0
+grpcio==1.84.1
+opentelemetry-api==1.45.1
+opentelemetry-sdk==1.45.1
+opentelemetry-exporter-otlp-proto-grpc==1.45.1
 p4python==2026.1.3027817
 pydantic==2.13.4
 requests==2.34.2
 truststore==0.10.4
-urllib3==2.7.0
+urllib3==2.8.0

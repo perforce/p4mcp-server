@@ -297,6 +297,8 @@ p4 client -o your_workspace | grep "^Root:"
 
 ### HTTP-based deployment
 
+> **Security:** HTTP binds to `127.0.0.1` (local only) by default. Use `--host 0.0.0.0` for remote clients. HTTP has no authentication, so expose it only on trusted networks.
+
 <details><summary><b>VM</b></summary>
 
 Run the MCP server on a VM using the HTTP transport, allowing clients to connect over the network.
@@ -304,7 +306,7 @@ Run the MCP server on a VM using the HTTP transport, allowing clients to connect
 **Start the server on the VM:**
 
 ```bash
-P4PORT=ssl:perforce.example.com:1666 P4USER=your_username P4PASSWD=YOUR_TICKET ./p4-mcp-server --readonly --transport http --port 8000
+P4PORT=ssl:perforce.example.com:1666 P4USER=your_username P4PASSWD=YOUR_TICKET ./p4-mcp-server --readonly --transport http --host 0.0.0.0 --port 8000
 ```
 
 **Configure the MCP client:**
@@ -339,8 +341,10 @@ docker run --rm -p 8000:8000 \
   -e P4PASSWD=YOUR_TICKET \
   -e P4DAM_API_KEY=your_api_key \
   ghcr.io/perforce/p4mcp-server:latest \
-  python3 -m p4mcp.main --readonly --transport http --port 8000
+  python3 -m p4mcp.main --readonly --transport http --host 0.0.0.0 --port 8000
 ```
+
+> **Note:** In a container, `--host 0.0.0.0` is required. To allow only the Docker host, use `-p 127.0.0.1:8000:8000`.
 
 **Configure the MCP client:**
 
@@ -666,6 +670,8 @@ See the [Windsurf MCP documentation](https://docs.windsurf.com/windsurf/cascade/
   - If both `--ca-bundle` and `--ssl-no-verify` are provided, `--ca-bundle` takes priority (verification is performed using the specified bundle).
 
   > **Priority order:** `--ca-bundle` > `--ssl-no-verify` > `P4MCP_CA_BUNDLE` > `P4MCP_SSL_VERIFY` > default (`true`). CLI args take priority over environment variables.
+
+- `--host <address>` - HTTP bind address. Default: `127.0.0.1` (local only). Use `0.0.0.0` to allow remote clients (no authentication; trusted networks only).
 
 - `--log-dir <path>` - Directory for log files.
   - Specify a custom directory for log files (both application and session logs).

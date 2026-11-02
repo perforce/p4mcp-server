@@ -26,15 +26,15 @@ annotated_types-0.8.0-py3-none-any.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/f2fd8f48-88eb-472e-b5f7-9803a4d91cb0
     Author:      the contributors
 
-anyio-4.15.1-py3-none-any.whl
+anyio-4.16.0-py3-none-any.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/ca4b0916-b462-4696-af47-ebfedfeb6e23
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/48efd0ea-1bb8-44d3-8c4b-e95989b98b4a
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2018 Alex Grönholm
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/ca4b0916-b462-4696-af47-ebfedfeb6e23
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/48efd0ea-1bb8-44d3-8c4b-e95989b98b4a
     Author:      Alex Grönholm
 
 attrs-26.1.0-py3-none-any.whl
@@ -48,15 +48,15 @@ attrs-26.1.0-py3-none-any.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/092f0165-1595-449d-ab0c-9fccc268c70a
     Author:      Hynek Schlawack and the attrs contributors
 
-authlib-1.8.0-py2.py3-none-any.whl
+authlib-1.9.2-py2.py3-none-any.whl
   Licenses:
     License:     BSD 3
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/2092f70a-c1a1-41d0-9e33-d7e7100615ff
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/5fec3034-9034-4be6-8b71-8dbbe2b1d600
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2017 Hsiaoming Yang
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/2092f70a-c1a1-41d0-9e33-d7e7100615ff
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/5fec3034-9034-4be6-8b71-8dbbe2b1d600
     Author:      Hsiaoming Yang
 
 backports.tarfile-1.2.0-py3-none-any.whl
@@ -65,41 +65,37 @@ backports.tarfile-1.2.0-py3-none-any.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/17927f5e-964e-4455-ab77-f9aa4db28c57
     LicenseText: License Text Under Appendix
 
-beartype-0.22.9-py3-none-any.whl
+beartype-0.23.1-py3-none-any.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/167ac3b4-204c-49a0-b527-98a3f1018307
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/34a53e46-e76c-4586-99a4-23e384bce1e3
     LicenseText: License Text Under Appendix
 
   Copyrights:
-    Copyright:   Copyright 2014-2025 Beartype authors
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/167ac3b4-204c-49a0-b527-98a3f1018307
+    Copyright:   Copyright 2014-2026 Beartype authors
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/34a53e46-e76c-4586-99a4-23e384bce1e3
     Author:      Beartype authors
 
-cachetools-7.2.0-py3-none-any.whl
+cachetools-7.2.8-py3-none-any.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/e1189a58-d862-43a3-84fb-5f58330e0002
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/850f388c-226c-4527-9f1e-49a8a38d4d77
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2014-2026 Thomas Kemmer
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/e1189a58-d862-43a3-84fb-5f58330e0002
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/850f388c-226c-4527-9f1e-49a8a38d4d77
     Author:      Thomas Kemmer
 
-    Copyright:   Copyright 2014-2026 Thomas Kemmer
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/e1189a58-d862-43a3-84fb-5f58330e0002
-    Author:      Thomas Kemmer
-
-caio-0.12.4-cp311-cp311-manylinux_2_34_x86_64.whl
+caio-0.12.10-cp311-cp311-manylinux_2_34_x86_64.whl
   Licenses:
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/d6c18d1c-0b84-4e28-bde6-487f265ad304
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/f0b4b423-97bb-4781-86f3-647b93b02256
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2025 Dmitry Orlov <me@mosquito.su>
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/d6c18d1c-0b84-4e28-bde6-487f265ad304
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/f0b4b423-97bb-4781-86f3-647b93b02256
     Author:      Dmitry Orlov <me@mosquito.su>
 
 caio-0.9.25
@@ -135,10 +131,10 @@ caio-0.9.25-py3-none-any.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/2cd86921-e6d2-47d8-b646-9bd4cb442878
     Author:      Dmitry Orlov <me@mosquito.su>
 
-certifi-2026.7.22-py3-none-any.whl
+certifi-2026.10.23-py3-none-any.whl
   Licenses:
     License:     Mozilla 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/c6bd10c3-a432-4bd1-a529-8879c97fe9c8
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/6512c389-ef60-4b8c-af14-677003bd6f0b
     LicenseText: License Text Under Appendix
 
 cffi-2.1.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
@@ -159,49 +155,37 @@ cffi-2.1.1-cp312-cp312-win_amd64.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/cd3738ee-f1d2-4d3c-9b7a-03e8c33c9640
     LicenseText: License Text Under Appendix
 
-charset_normalizer-3.5.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
+charset_normalizer-3.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/079cac85-c31f-4ef6-a8bb-fc97fb47d435
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/40bcb1d8-fd01-4dbf-8f84-5f88d1696172
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2025 TAHRI Ahmed R
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/079cac85-c31f-4ef6-a8bb-fc97fb47d435
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/40bcb1d8-fd01-4dbf-8f84-5f88d1696172
     Author:      TAHRI Ahmed R
 
-    Copyright:   Copyright 2025 TAHRI Ahmed R
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/c695870c-05a2-40cb-aa88-69c33c238992
-    Author:      TAHRI Ahmed R
-
-charset_normalizer-3.5.1-cp312-cp312-macosx_10_13_universal2.whl
+charset_normalizer-3.5.2-cp312-cp312-macosx_10_13_universal2.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/77cadfa5-e237-47fb-a7f1-4edd5aff4752
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/419f4d46-ba23-41d7-bc57-a212feb7e60c
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2025 TAHRI Ahmed R
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/77cadfa5-e237-47fb-a7f1-4edd5aff4752
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/419f4d46-ba23-41d7-bc57-a212feb7e60c
     Author:      TAHRI Ahmed R
 
-    Copyright:   Copyright 2025 TAHRI Ahmed R
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/77cadfa5-e237-47fb-a7f1-4edd5aff4752
-    Author:      TAHRI Ahmed R
-
-charset_normalizer-3.5.1-cp312-cp312-win_amd64.whl
+charset_normalizer-3.5.2-cp312-cp312-win_amd64.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/2f586295-6a8e-4f4c-953e-7b67b824e58a
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/e5c8529b-4c2c-4a9d-85a0-a7f9012bc149
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2025 TAHRI Ahmed R
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/3732ce05-652a-4266-9b73-05aeff18a235
-    Author:      TAHRI Ahmed R
-
-    Copyright:   Copyright 2025 TAHRI Ahmed R
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/3732ce05-652a-4266-9b73-05aeff18a235
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/e5c8529b-4c2c-4a9d-85a0-a7f9012bc149
     Author:      TAHRI Ahmed R
 
 click-8.5.0-py3-none-any.whl
@@ -215,70 +199,70 @@ click-8.5.0-py3-none-any.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/f82be191-52fc-43ac-90b1-18d127b6d972
     Author:      Pallets
 
-cryptography-50.0.1-cp311-abi3-macosx_11_0_arm64.whl
+cryptography-50.0.2-cp311-abi3-macosx_11_0_arm64.whl
   Licenses:
     License:     BSD 3
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/589639a6-f11f-4b75-a794-0c4fd18f6bf8
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/71a85411-333b-4fbd-bd6d-b7a5228e3ee5
     LicenseText: License Text Under Appendix
 
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/589639a6-f11f-4b75-a794-0c4fd18f6bf8
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/71a85411-333b-4fbd-bd6d-b7a5228e3ee5
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright Individual contributors
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/82babdf5-f6d7-489e-8beb-b7ae651f755b
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/ef19cb9b-569c-4323-8e7b-0c26fa486eac
     Author:      Individual contributors
 
-cryptography-50.0.1-cp311-abi3-manylinux_2_34_x86_64.whl
+cryptography-50.0.2-cp311-abi3-manylinux_2_34_x86_64.whl
   Licenses:
     License:     BSD 3
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/a7cc5371-1e1e-4655-a8d2-7fc24777d2d2
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/7c4357b9-4dd9-483f-8355-dc2b38ea1324
     LicenseText: License Text Under Appendix
 
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/a7cc5371-1e1e-4655-a8d2-7fc24777d2d2
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/7c4357b9-4dd9-483f-8355-dc2b38ea1324
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright Individual contributors
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/f8eaa0b9-051f-47b4-97bd-60f99ba262c6
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/ec19c51c-6d40-4340-8593-5d58ae2b6d2f
     Author:      Individual contributors
 
-cryptography-50.0.1-cp311-abi3-win_amd64.whl
+cryptography-50.0.2-cp311-abi3-win_amd64.whl
   Licenses:
     License:     BSD 3
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/785ce00e-29dd-4ea3-a275-b5ad01f6467a
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/5667911b-c864-41a7-84d7-a6f93c2e76f5
     LicenseText: License Text Under Appendix
 
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/785ce00e-29dd-4ea3-a275-b5ad01f6467a
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/5667911b-c864-41a7-84d7-a6f93c2e76f5
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright Individual contributors
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/048761a5-af31-4b9e-87cc-76572b875335
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/721d2856-91a2-43f1-ae14-16a2230a271c
     Author:      Individual contributors
 
-cyclopts-5.0.0-py3-none-any.whl
+cyclopts-5.3.2-py3-none-any.whl
   Licenses:
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/55ec4150-152a-4da8-a144-0f7a603e04bc
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/8fb67858-276c-4601-9f80-b7b7e8c2ec9d
     LicenseText: License Text Under Appendix
 
-dnspython-2.8.0-py3-none-any.whl
+dnspython-2.9.1-py3-none-any.whl
   Licenses:
     License:     ISC
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/82df1585-176f-41e2-abca-43d7d63407d0
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/da74d44f-f0fb-4b7f-a94a-9ca4f9f54fa0
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2001-2017 Nominum, Inc
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/82df1585-176f-41e2-abca-43d7d63407d0
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/da74d44f-f0fb-4b7f-a94a-9ca4f9f54fa0
     Author:      Nominum, Inc
 
     Copyright:   Copyright Dnspython Contributors
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/82df1585-176f-41e2-abca-43d7d63407d0
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/da74d44f-f0fb-4b7f-a94a-9ca4f9f54fa0
     Author:      Dnspython Contributors
 
 docstring_parser-0.18.0-py3-none-any.whl
@@ -325,22 +309,22 @@ fastmcp_slim-3.4.4-py3-none-any.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/cc5c94b0-97d1-430d-abc2-24514bbd47e3
     LicenseText: License Text Under Appendix
 
-googleapis_common_protos-1.75.4-py3-none-any.whl
+googleapis_common_protos-1.76.0-py3-none-any.whl
   Licenses:
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/35786e95-758f-4501-8016-fb835a7bb1c2
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/b4b1a0ee-764d-49ca-aebf-cd76f7341c67
     LicenseText: License Text Under Appendix
 
-griffelib-2.3.0-py3-none-any.whl
+griffelib-2.4.1-py3-none-any.whl
   Licenses:
     License:     ISC
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/5cf879da-6318-4f5d-91c7-81b7a3d7c23d
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/f32ca07c-0464-4a3e-a44f-0dfe3e29fac4
     LicenseText: License Text Under Appendix
 
   Copyrights:
-    Copyright:   Copyright 2021 Timothée Mazzucotelli
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/5cf879da-6318-4f5d-91c7-81b7a3d7c23d
-    Author:      Timothée Mazzucotelli
+    Copyright:   Copyright 2021 Timothée Mazzucotelli and contributors
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/f32ca07c-0464-4a3e-a44f-0dfe3e29fac4
+    Author:      Timothée Mazzucotelli and contributors
 
 grpc-v1.81.1
   Licenses:
@@ -365,37 +349,37 @@ grpc-v1.81.1
     Reference:   https://github.com/grpc/grpc/blob/v1.81.1/setup.py
     Author:      gRPC authors
 
-grpcio-1.81.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
+grpcio-1.84.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
   Licenses:
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/47871fb9-1d83-45dc-b9b0-2c179ad0b2c5
+    Reference:   https://pypi.python.org/pypi/grpcio/1.84.1
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2016 Google Inc
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/59305835-acd5-4092-8faf-0a739e8aa2c9
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/f06ab5f2-408e-4cb8-a0d9-fc7e6e43b338
     Author:      Google Inc
 
-grpcio-1.81.1-cp312-cp312-macosx_11_0_universal2.whl
+grpcio-1.84.1-cp312-cp312-macosx_11_0_universal2.whl
   Licenses:
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/93b02541-61b9-497a-b903-f0ecb88b2c15
+    Reference:   https://pypi.python.org/pypi/grpcio/1.84.1
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2016 Google Inc
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/a1b39611-2701-407a-9b70-e7ea4880108f
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/0f06cfe2-3be1-4b11-9e15-e84751cb77bf
     Author:      Google Inc
 
-grpcio-1.81.1-cp312-cp312-win_amd64.whl
+grpcio-1.84.1-cp312-cp312-win_amd64.whl
   Licenses:
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/011d2769-af6b-4250-8ca1-26a74a5175fc
+    Reference:   https://pypi.python.org/pypi/grpcio/1.84.1
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2016 Google Inc
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/bf20f6b1-9b1e-43c3-b541-a54f7e7d7f56
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/e2391490-e0f4-40ba-beb8-850b21e0e1b6
     Author:      Google Inc
 
 h11-0.16.0-py3-none-any.whl
@@ -453,15 +437,15 @@ idna-3.20-py3-none-any.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/e130afc6-be84-4e05-a9f0-417319188c75
     Author:      Kim Davies and contributors
 
-importlib_metadata-9.0.1-py3-none-any.whl
+importlib_metadata-10.1.0-py3-none-any.whl
   Licenses:
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/50763c73-97a3-4abd-898f-4144d19b69cc
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/03ad5128-cbf6-4322-9b65-16374e73d18b
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2026 name of owner
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/50763c73-97a3-4abd-898f-4144d19b69cc
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/03ad5128-cbf6-4322-9b65-16374e73d18b
     Author:      name of owner
 
 jaraco.classes-3.4.0-py3-none-any.whl
@@ -493,15 +477,15 @@ jeepney-0.9.0-py3-none-any.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/586bbf17-8750-4026-b001-d4db1fec22f4
     Author:      Thomas Kluyver
 
-joserfc-1.7.5-py3-none-any.whl
+joserfc-1.7.7-py3-none-any.whl
   Licenses:
     License:     BSD 3
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/b722da92-e022-4936-9b02-c6b3e9bf9326
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/10bb2af3-ddad-488d-8468-003aafc25d44
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2023 Hsiaoming Yang
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/b722da92-e022-4936-9b02-c6b3e9bf9326
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/10bb2af3-ddad-488d-8468-003aafc25d44
     Author:      Hsiaoming Yang
 
 jsonref-1.1.0-py3-none-any.whl
@@ -623,15 +607,15 @@ mdurl-0.1.2-py3-none-any.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/c46e8e5a-ad69-4afa-9732-e297581444cb
     Author:      Vitaly Puzrin, Alex Kocharin
 
-more_itertools-11.1.0-py3-none-any.whl
+more_itertools-11.2.1-py3-none-any.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/28af371f-7677-4055-a839-a5c8ecb320d9
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/ad1e5699-19bd-47f0-98d6-00608d34a826
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2012 Erik Rose
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/28af371f-7677-4055-a839-a5c8ecb320d9
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/ad1e5699-19bd-47f0-98d6-00608d34a826
     Author:      Erik Rose
 
 msvcp140-14.38.33130.0.dll
@@ -645,55 +629,61 @@ msvcp140-14.38.33130.0.dll
     Reference:   null
     Author:      Microsoft Corporation
 
-openapi_pydantic-0.5.1-py3-none-any.whl
+openapi_pydantic-0.6.0-py3-none-any.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/bc8202c6-0f8a-4900-b3de-a910a98fcb56
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/cc182efe-2129-4d9f-b0f4-13a4b4e34b4a
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2023 mike-oakley
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/bc8202c6-0f8a-4900-b3de-a910a98fcb56
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/cc182efe-2129-4d9f-b0f4-13a4b4e34b4a
     Author:      mike-oakley
 
     Copyright:   Copyright 2020 Kuimono
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/bc8202c6-0f8a-4900-b3de-a910a98fcb56
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/cc182efe-2129-4d9f-b0f4-13a4b4e34b4a
     Author:      Kuimono
 
-opentelemetry_api-1.43.0-py3-none-any.whl
+opentelemetry_api-1.45.1-py3-none-any.whl
   Licenses:
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/e54aca9b-5961-4364-acea-eaedd1eac7e3
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/c72b8bc8-358f-4562-b689-e24a85b09ff6
     LicenseText: License Text Under Appendix
 
-opentelemetry_exporter_otlp_proto_common-1.43.0-py3-none-any.whl
+opentelemetry_exporter_otlp_common-0.66b1-py3-none-any.whl
   Licenses:
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/50769b36-b5db-422e-862f-ace69399ec69
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/5c56ac6c-6399-47be-9646-25c39f99d3d0
     LicenseText: License Text Under Appendix
 
-opentelemetry_exporter_otlp_proto_grpc-1.43.0-py3-none-any.whl
+opentelemetry_exporter_otlp_proto_common-1.45.1-py3-none-any.whl
   Licenses:
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/4d867037-0a41-4528-bfb6-ac3d79ff98cf
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/6d39294b-09b8-44a3-af2d-f2e0e165223e
     LicenseText: License Text Under Appendix
 
-opentelemetry_proto-1.43.0-py3-none-any.whl
+opentelemetry_exporter_otlp_proto_grpc-1.45.1-py3-none-any.whl
   Licenses:
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/5890f3b9-4053-4493-9e99-89a2e22fd026
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/8612caa2-5a38-4fb8-9a8e-d0b99ea1c51b
     LicenseText: License Text Under Appendix
 
-opentelemetry_sdk-1.43.0-py3-none-any.whl
+opentelemetry_proto-1.45.1-py3-none-any.whl
   Licenses:
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/2d4eb82d-d6e8-4eec-b24f-ee066a418321
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/b09781ee-4e07-4d26-84bd-fdbd1a9710ec
     LicenseText: License Text Under Appendix
 
-opentelemetry_semantic_conventions-0.64b0-py3-none-any.whl
+opentelemetry_sdk-1.45.1-py3-none-any.whl
   Licenses:
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/330879ea-d189-4db6-8679-81fee208e740
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/cfc21466-7eaf-47e5-9f2a-ec05097f694a
+    LicenseText: License Text Under Appendix
+
+opentelemetry_semantic_conventions-0.66b1-py3-none-any.whl
+  Licenses:
+    License:     Apache 2.0
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/f8756a95-2af2-4bd4-8eff-6d4408aafef8
     LicenseText: License Text Under Appendix
 
 p4python-2026.1.3027817-cp311-cp311-manylinux_2_28_x86_64.whl
@@ -894,15 +884,15 @@ pathable-0.6.0-py3-none-any.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/0e916372-6afd-417a-b402-4d4f6de53e0a
     LicenseText: License Text Under Appendix
 
-platformdirs-4.11.13-py3-none-any.whl
+platformdirs-4.14.3-py3-none-any.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/408ab091-ffca-4b7a-b280-8dbc94a285f9
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/7183ca5a-8c26-478b-a195-b30190768933
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2010 The platformdirs developers
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/408ab091-ffca-4b7a-b280-8dbc94a285f9
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/7183ca5a-8c26-478b-a195-b30190768933
     Author:      The platformdirs developers
 
 protobuf-7.36.2-cp310-abi3-macosx_10_9_universal2.whl
@@ -949,19 +939,19 @@ py_key_value_aio-0.4.6-py3-none-any.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/f02512b2-0537-4d84-a750-f4aa553f10aa
     Author:      strawgate
 
-pycparser-3.0-py3-none-any.whl
+pycparser-3.12-py3-none-any.whl
   Licenses:
     License:     BSD 3
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/240fb629-3e6d-4970-b2ba-b9a7d87e1597
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/e5b95962-9ebc-4fc7-be57-6c4308b1cdc5
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright parser in Python
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/240fb629-3e6d-4970-b2ba-b9a7d87e1597
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/e5b95962-9ebc-4fc7-be57-6c4308b1cdc5
     Author:      parser in Python
 
-    Copyright:   Copyright 2008-2022 Eli Bendersky
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/240fb629-3e6d-4970-b2ba-b9a7d87e1597
+    Copyright:   Copyright 2008-2027 Eli Bendersky
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/e5b95962-9ebc-4fc7-be57-6c4308b1cdc5
     Author:      Eli Bendersky
 
 pydantic-2.13.4-py3-none-any.whl
@@ -1003,15 +993,15 @@ pydantic_core-2.46.4-cp312-cp312-win_amd64.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/6cc96852-2ebf-49b8-8e8e-9472ef9a114b
     Author:      Samuel Colvin
 
-pydantic_settings-2.15.0-py3-none-any.whl
+pydantic_settings-2.16.2-py3-none-any.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/68e6c8aa-725d-4fe5-933b-b517b157c9f4
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/4ef6847b-d1c3-4897-b4df-b60b5b91ee9f
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2022 Samuel Colvin and other contributors
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/68e6c8aa-725d-4fe5-933b-b517b157c9f4
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/4ef6847b-d1c3-4897-b4df-b60b5b91ee9f
     Author:      Samuel Colvin and other contributors
 
 pygments-2.21.0-py3-none-any.whl
@@ -1025,15 +1015,15 @@ pygments-2.21.0-py3-none-any.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/dcfddffa-f008-447e-b507-a262e958bb4f
     Author:      the Pygments team; see ``AUTHORS``
 
-pyjwt-2.15.0-py3-none-any.whl
+pyjwt-2.15.1-py3-none-any.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/4ed04199-270a-4a2a-869f-a12f799f8523
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/839a4485-10b7-44d7-be0d-0d1f5631471f
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2015-2022 Jos
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/4ed04199-270a-4a2a-869f-a12f799f8523
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/839a4485-10b7-44d7-be0d-0d1f5631471f
     Author:      Jos
 
 pyperclip-1.11.0-py3-none-any.whl
@@ -1109,21 +1099,21 @@ python312-3.12.0.dll
     Reference:   null
     Author:      Python Software Foundation
 
-python_dotenv-1.2.3-py3-none-any.whl
+python_dotenv-1.2.4-py3-none-any.whl
   Licenses:
     License:     BSD 3
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/70081f83-f201-4a1e-bf6c-b4eaca4a038d
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/d9904e0c-8d07-4a70-95cf-83490342c891
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2014-2013 Jacob Kaplan-Moss
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/70081f83-f201-4a1e-bf6c-b4eaca4a038d
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/d9904e0c-8d07-4a70-95cf-83490342c891
     Author:      Jacob Kaplan-Moss
 
-python_multipart-0.0.32-py3-none-any.whl
+python_multipart-0.0.33-py3-none-any.whl
   Licenses:
     License:     Apache 2.0
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/1a02d063-0833-4fe3-a6cc-29c02e8cf658
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/ed730349-3316-4b70-9e1c-c9a8c2ba33e1
     LicenseText: License Text Under Appendix
 
 pythoncom312.dll
@@ -1211,48 +1201,48 @@ rich-15.0.0-py3-none-any.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/c6f4b299-084f-4957-8e36-d007c34bc013
     Author:      Will McGugan
 
-rich_rst-2.1.0-py3-none-any.whl
+rich_rst-2.2.0-py3-none-any.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/c8e33f31-6ab7-4ec5-a211-9fd1ffe01833
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/80a4f770-c100-47c6-a26d-7996064c23ec
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2026 Wasi Master
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/c8e33f31-6ab7-4ec5-a211-9fd1ffe01833
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/80a4f770-c100-47c6-a26d-7996064c23ec
     Author:      Wasi Master
 
-rpds_py-2026.6.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+rpds_py-2026.9.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/3d263e40-5d4a-4237-8e4a-c98d7c04a13d
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/7032303a-6d22-4625-92e8-761cb8b38a8e
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2023 Julian Berman
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/3d263e40-5d4a-4237-8e4a-c98d7c04a13d
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/7032303a-6d22-4625-92e8-761cb8b38a8e
     Author:      Julian Berman
 
-rpds_py-2026.6.3-cp312-cp312-macosx_11_0_arm64.whl
+rpds_py-2026.9.1-cp312-cp312-macosx_11_0_arm64.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/c735e1a8-5ca9-4c98-8818-a598ed753acd
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/9c9f95ef-3b9e-427c-9451-ef34897df6f0
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2023 Julian Berman
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/c735e1a8-5ca9-4c98-8818-a598ed753acd
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/9c9f95ef-3b9e-427c-9451-ef34897df6f0
     Author:      Julian Berman
 
-rpds_py-2026.6.3-cp312-cp312-win_amd64.whl
+rpds_py-2026.9.1-cp312-cp312-win_amd64.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/d7f3ceaa-b408-4635-bbbc-68f3d720407d
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/ce9ca5ed-f96e-488b-8fe1-1f632f2701fb
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2023 Julian Berman
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/d7f3ceaa-b408-4635-bbbc-68f3d720407d
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/ce9ca5ed-f96e-488b-8fe1-1f632f2701fb
     Author:      Julian Berman
 
 secretstorage-3.5.0-py3-none-any.whl
@@ -1266,27 +1256,27 @@ secretstorage-3.5.0-py3-none-any.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/ac77f5a1-7434-4dc7-a3f7-8583ba2c2ba2
     Author:      Dmitry Shachnev <mitya57@gmail.com>
 
-sse_starlette-3.4.11-py3-none-any.whl
+sse_starlette-3.6.0-py3-none-any.whl
   Licenses:
     License:     BSD 3
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/aa1c286f-ada4-46fe-991c-51696a9656ec
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/c937cf2d-646f-497f-ab97-5fefa4b9d20e
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2020 sysidhttps://sysid.github.io/
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/aa1c286f-ada4-46fe-991c-51696a9656ec
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/c937cf2d-646f-497f-ab97-5fefa4b9d20e
     Author:      sysidhttps://sysid.github.io/
 
-starlette-1.7.0-py3-none-any.whl
+starlette-1.10.0-py3-none-any.whl
   Licenses:
     License:     BSD 3
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/3153cafa-143b-4623-b1cc-d0d6eb6aa5ce
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/379eaafa-222e-430e-80b9-6e140fee2aa4
     LicenseText: License Text Under Appendix
 
   Copyrights:
-    Copyright:   Copyright 2018 Encode OSS Ltd" https://www.encode.io/
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/3153cafa-143b-4623-b1cc-d0d6eb6aa5ce
-    Author:      Encode OSS Ltd" https://www.encode.io/
+    Copyright:   Copyright 2018 Encode OSS Ltd https://www.encode.io/
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/379eaafa-222e-430e-80b9-6e140fee2aa4
+    Author:      Encode OSS Ltd https://www.encode.io/
 
 threadpool-2539dd0f7a658a6d3d9d493934d1c16f5cf1d8d9
   Licenses:
@@ -1336,47 +1326,43 @@ typing_inspection-0.4.4-py3-none-any.whl
     Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/565e8590-b194-42ec-bf5b-bea614e8c9a7
     Author:      to present
 
-uncalled_for-0.4.0-py3-none-any.whl
+uncalled_for-0.4.1-py3-none-any.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/a3181fec-a429-4b0f-9140-c5102c367852
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/de961859-0269-4b36-9f00-15bf09b19d87
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2025 Chris Guidry
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/a3181fec-a429-4b0f-9140-c5102c367852
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/de961859-0269-4b36-9f00-15bf09b19d87
     Author:      Chris Guidry
 
-    Copyright:   Copyright 2025 Chris Guidry
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/a3181fec-a429-4b0f-9140-c5102c367852
-    Author:      Chris Guidry
-
-urllib3-2.7.0-py3-none-any.whl
+urllib3-2.8.0-py3-none-any.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/ff788270-e5f0-4b25-8703-95088a709425
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/c9625c91-5c22-4283-96f5-fac25d57b458
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2008-2020 Andrey Petrov and contributors
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/ff788270-e5f0-4b25-8703-95088a709425
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/c9625c91-5c22-4283-96f5-fac25d57b458
     Author:      Andrey Petrov and contributors
 
-uvicorn-0.53.0-py3-none-any.whl
+uvicorn-0.54.0-py3-none-any.whl
   Licenses:
     License:     BSD 3
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/765661ba-f2f0-4422-8372-0633f9188286
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/d1b5f9f3-b91c-41fa-9946-04456a5fa566
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright 2017 Encode OSS Ltd" https://www.encode.io/
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/765661ba-f2f0-4422-8372-0633f9188286
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/d1b5f9f3-b91c-41fa-9946-04456a5fa566
     Author:      Encode OSS Ltd" https://www.encode.io/
 
 vcruntime140-14.34.31938.0.dll
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/2a90e4ac-8b59-46b5-a4f0-b2169e4b2628
+    Reference:   https://licenses.nuget.org/MIT
     LicenseText: License Text Under Appendix
 
   Copyrights:
@@ -1434,37 +1420,42 @@ websockets-17.1
     Reference:   https://github.com/python-websockets/websockets/blob/17.1/LICENSE
     LicenseText: License Text Under Appendix
 
-websockets-17.1-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl
-  Licenses:
-    License:     BSD 3
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/a5ffab29-58e0-4342-9a33-17f6bb190a0d
-    LicenseText: License Text Under Appendix
-
   Copyrights:
     Copyright:   Copyright Aymeric Augustin and contributors
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/a5ffab29-58e0-4342-9a33-17f6bb190a0d
+    Reference:   https://github.com/python-websockets/websockets/blob/17.1/LICENSE
     Author:      Aymeric Augustin and contributors
 
-websockets-17.1-cp312-cp312-macosx_11_0_arm64.whl
+websockets-17.4-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl
   Licenses:
     License:     BSD 3
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/7b5a9f5e-c8b9-4642-99a5-d7c4e5312b79
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/0395435b-e530-44f0-bc2c-e1f20553c710
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright Aymeric Augustin and contributors
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/7b5a9f5e-c8b9-4642-99a5-d7c4e5312b79
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/0395435b-e530-44f0-bc2c-e1f20553c710
     Author:      Aymeric Augustin and contributors
 
-websockets-17.1-cp312-cp312-win_amd64.whl
+websockets-17.4-cp312-cp312-macosx_11_0_arm64.whl
   Licenses:
     License:     BSD 3
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/158fbe1c-0262-4c9f-9518-0603f1062b7f
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/db3fb59e-eccb-4843-9e40-8b78740d3585
     LicenseText: License Text Under Appendix
 
   Copyrights:
     Copyright:   Copyright Aymeric Augustin and contributors
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/158fbe1c-0262-4c9f-9518-0603f1062b7f
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/db3fb59e-eccb-4843-9e40-8b78740d3585
+    Author:      Aymeric Augustin and contributors
+
+websockets-17.4-cp312-cp312-win_amd64.whl
+  Licenses:
+    License:     BSD 3
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/8c5e18f1-5ab0-4659-995a-7519fcea55c6
+    LicenseText: License Text Under Appendix
+
+  Copyrights:
+    Copyright:   Copyright Aymeric Augustin and contributors
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/8c5e18f1-5ab0-4659-995a-7519fcea55c6
     Author:      Aymeric Augustin and contributors
 
 ydb-meta-1.0.8.3.dev
@@ -1478,34 +1469,14 @@ ydb-meta-1.0.8.3.dev
     Reference:   https://github.com/ydb-platform/ydb/blob/meta-1.0.8.3.dev/LICENSE
     Author:      YANDEX LLC
 
-zipp-4.1.0-py3-none-any.whl
+zipp-4.1.2-py3-none-any.whl
   Licenses:
     License:     MIT
-    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/dca82957-704a-4ba6-a0b5-0e5641080681
+    Reference:   https://index.mend.io/gri/app/reader/resource/content/asString/97a4181f-0567-4d47-b8af-8cdb2cb51c04
     LicenseText: License Text Under Appendix
 
 
   Appendix:
----
-ISC
----
-ISC License
-
-Copyright (c) 2021, Timothée Mazzucotelli
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-
 -----------
 Mozilla 2.0
 -----------
@@ -1884,6 +1855,26 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
   defined by the Mozilla Public License, v. 2.0.
 
 
+---
+ISC
+---
+ISC License:
+
+Copyright (c) 2004-2010 by Internet Systems Consortium, Inc. ("ISC")
+Copyright (c) 1995-2003 by Internet Software Consortium
+
+Permission to use, copy, modify, and/or distribute this software for any purpose with or
+without fee is hereby granted, provided that the above copyright notice and this
+permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT
+SHALL ISC BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY
+DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE
+USE OR PERFORMANCE OF THIS SOFTWARE.
+
+
 ---------
 Unlicense
 ---------
@@ -2086,31 +2077,33 @@ Microsoft Visual C++ 2010 Runtime Libraries
 -----
 BSD 3
 -----
-Copyright (c) <year> <owner>.
+Copyright © 2017-present, [Encode OSS Ltd](https://www.encode.io/).
+All rights reserved.
 
-Redistribution and use in source and binary forms, with or without modification, are
-permitted provided that the following conditions are met:
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
 
-1. Redistributions of source code must retain the above copyright notice, this list of
-conditions and the following disclaimer.
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
 
-2. Redistributions in binary form must reproduce the above copyright notice, this list of
-conditions and the following disclaimer in the documentation and/or other materials
-provided with the distribution.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
 
-3. Neither the name of the copyright holder nor the names of its contributors may be used
-to endorse or promote products derived from this software without specific prior written
-permission.
+* Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 -----
@@ -2356,7 +2349,7 @@ Apache 2.0
    APPENDIX: How to apply the Apache License to your work.
 
       To apply the Apache License to your work, attach the following
-      boilerplate notice, with the fields enclosed by brackets "{}"
+      boilerplate notice, with the fields enclosed by brackets "[]"
       replaced with your own identifying information. (Don't include
       the brackets!)  The text should be enclosed in the appropriate
       comment syntax for the file format. We also recommend that a
@@ -2364,7 +2357,7 @@ Apache 2.0
       same "printed page" as the copyright notice for easier
       identification within third-party archives.
 
-   Copyright 2025 Dmitry Orlov <me@mosquito.su>
+   Copyright 2025 strawgate
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -2389,24 +2382,23 @@ MIT
 ---
 The MIT License (MIT)
 
-Copyright (c) 2017 to present Samuel Colvin
+Copyright (c) 2014-2026 Thomas Kemmer
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 

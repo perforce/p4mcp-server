@@ -2,6 +2,7 @@ import sys
 import os
 import logging
 import argparse
+import ipaddress
 import signal
 from pathlib import Path
 from typing import Optional
@@ -86,6 +87,13 @@ def parse_args() -> argparse.Namespace:
         help="Port for HTTP transport (default: 8000)"
     )
     parser.add_argument(
+        "--host",
+        type=str,
+        default="127.0.0.1",
+        help="Bind address for HTTP transport (default: 127.0.0.1, local connections only). "
+             "Use 0.0.0.0 to accept connections from other machines; the HTTP transport has no authentication."
+    )
+    parser.add_argument(
         "--max-results",
         type=int,
         default=None,
@@ -132,6 +140,22 @@ def resolve_log_dir(args, config) -> Optional[str]:
     if config.log_dir:
         return config.log_dir
     return None  # use default
+
+def is_loopback_host(host: str) -> bool:
+    """Check whether a bind address only accepts connections from the local machine.
+
+    Args:
+        host: Bind address passed to the HTTP transport (IP literal or hostname)
+
+    Returns:
+        True for "localhost" and loopback IPs (127.0.0.0/8, ::1); False otherwise.
+    """
+    if host == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
 
 def main() -> None:
     # Parse arguments first (before any logging)
@@ -183,8 +207,14 @@ def main() -> None:
             p4dam_api_key=p4dam_api_key,
         )
         if args.transport == "http":
-            logger.info(f"Starting P4 MCP Server with HTTP transport on port {args.port}")
-            server.run(transport="http", port=args.port, host="0.0.0.0")
+            logger.info(f"Starting P4 MCP Server with HTTP transport on {args.host}:{args.port}")
+            if not is_loopback_host(args.host):
+                logger.warning(
+                    f"HTTP transport is bound to {args.host}, which accepts connections from other machines, "
+                    "and has no authentication: any client that can reach this port can use every tool "
+                    "as the configured Perforce user."
+                )
+            server.run(transport="http", port=args.port, host=args.host)
         else:
             logger.info("Starting P4 MCP Server with stdio transport")
             server.run()

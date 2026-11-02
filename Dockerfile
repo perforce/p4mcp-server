@@ -7,6 +7,7 @@ LABEL io.modelcontextprotocol.server.name="io.github.perforce/p4mcp-server"
 RUN apt-get update && apt-get install -y \
     build-essential \
     gosu \
+    && apt-get install -y --only-upgrade ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
@@ -14,7 +15,7 @@ WORKDIR /app
 
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade "pip==26.2.2" && pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY p4mcp/ ./p4mcp/
