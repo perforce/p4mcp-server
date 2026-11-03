@@ -1965,12 +1965,43 @@ class StreamServices:
                 
                 spec = stream_spec[0]
                 
-                # Step 3: Validate each file path
+                # Step 3: Validate each file path.
+                # 'p4 where' is the authoritative mapping check and accepts any
+                # path form (local, client, or depot); the spec classifier below
+                # only understands depot paths, so it must never be the reason a
+                # server-mapped file gets reported as outside_view.
                 results = []
                 all_allowed = True
                 for fp in file_paths:
-                    classification = self._classify_path_against_stream(fp, spec)
+                    try:
+                        where = p4.run("where", fp)
+                        where_error = None
+                    except P4Exception as e:
+                        where = []
+                        where_error = str(e)
+                    mapped = [w for w in where if isinstance(w, dict) and "unmap" not in w]
+                    if not mapped:
+                        results.append({
+                            "allowed": False,
+                            "rule": "outside_view",
+                            "detail": where_error or "Not mapped in the workspace view (p4 where)",
+                            "file": fp,
+                        })
+                        all_allowed = False
+                        continue
+                    depot_file = mapped[-1].get("depotFile", fp)
+                    classification = self._classify_path_against_stream(depot_file, spec)
+                    if classification["rule"] == "outside_view":
+                        # The server maps it; the lightweight classifier just
+                        # failed to recognise the pattern. Trust the server.
+                        classification = {
+                            "allowed": True,
+                            "rule": "mapped",
+                            "detail": "Mapped in the workspace view (p4 where); "
+                                      "no specific stream path rule matched",
+                        }
                     classification["file"] = fp
+                    classification["depotFile"] = depot_file
                     results.append(classification)
                     if not classification["allowed"]:
                         all_allowed = False
