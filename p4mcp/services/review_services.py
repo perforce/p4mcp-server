@@ -449,11 +449,16 @@ class ReviewServices:
             url = f"{api_base}/reviews/{review_id}/participants"
             payload = {"participants": {}}
 
+            # Swarm v11 expects dictionaries keyed by user/group name
+            # ({"users": {"bjones": []}}); plain arrays are silently ignored.
+            # delete_participants below already follows this convention.
             if users:
-                payload["participants"]["users"] = users
+                payload["participants"]["users"] = (
+                    users if isinstance(users, dict) else {u: [] for u in users})
 
             if groups:
-                payload["participants"]["groups"] = groups
+                payload["participants"]["groups"] = (
+                    groups if isinstance(groups, dict) else {g: [] for g in groups})
 
             r = requests.post(url, auth=auth, json=payload, verify=self.verify_ssl)
             return {"status": "success", "message": self._handle_response(r)}
