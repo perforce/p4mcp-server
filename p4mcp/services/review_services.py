@@ -212,11 +212,23 @@ class ReviewServices:
 
             if fields:
                 params["fields[]"] = fields
-            if include_transitions:
-                params["transitions"] = "true"
 
             r = requests.get(url, auth=auth, params=params if params else None, verify=self.verify_ssl)
-            return {"status": "success", "message": self._handle_response(r)}
+            payload = self._handle_response(r)
+            if include_transitions:
+                # The `transitions=true` query flag is silently ignored by
+                # Swarm v11 servers. Fetch the dedicated endpoint instead and
+                # merge its fields into the review object so the flag behaves
+                # consistently regardless of server version.
+                transitions_response = requests.get(
+                    f"{url}/transitions", auth=auth, verify=self.verify_ssl)
+                transitions_payload = self._handle_response(transitions_response)
+                review = payload.get("review") if isinstance(payload, dict) else None
+                if isinstance(review, dict) and isinstance(transitions_payload, dict):
+                    for field in ("transitions", "blocked"):
+                        if field in transitions_payload:
+                            review[field] = transitions_payload[field]
+            return {"status": "success", "message": payload}
         except Exception as e:
             logger.error(f"Failed to get review info for '{review_id}': {e}")
             return {"status": "error", "message": str(e)}
